@@ -55,7 +55,7 @@ class Abn:
 
         # Store file format version from the first line
         header_data["version"] = lines[0].strip()
-        print(header_data["version"])
+        #print(header_data["version"])
 
         """
         Read the header data.
@@ -90,11 +90,11 @@ class Abn:
             # The number of configurations
             if self.n_conf_flag in line:
                 header_data["n_conf"] = int(lines[i+2].strip())
-                print(f"n_conf: {header_data['n_conf']}")
+                #print(f"n_conf: {header_data['n_conf']}")
             # The maximum number of atom types
             elif self.max_n_atom_type_flag in line:
                 header_data["max_n_atom_type"] = int(lines[i+2].strip())
-                print(f"max_n_atom_type: {header_data['max_n_atom_type']}")
+                #print(f"max_n_atom_type: {header_data['max_n_atom_type']}")
             # The atom types in the data file (single or multiple lines)
             elif self.all_atom_type_flag in line:
                 end_idx = self.get_section_end_idx(lines, i, self.star_line)
@@ -103,15 +103,15 @@ class Abn:
                     #print(lines[j].strip().split())
                     all_atom_type.extend(lines[j].strip().split())
                 header_data["all_atom_type"] = all_atom_type
-                print(f"all_atom_type: {header_data['all_atom_type']}")
+                #print(f"all_atom_type: {header_data['all_atom_type']}")
             # The maximum number of atoms per system
             elif self.max_n_atom_per_sys_flag in line:
                 header_data["max_n_atom_per_sys"] = int(lines[i+2].strip())
-                print(f"max_n_atom_per_sys: {header_data['max_n_atom_per_sys']}")
+                #print(f"max_n_atom_per_sys: {header_data['max_n_atom_per_sys']}")
             # The maximum number of atoms per atom type
             elif self.max_n_atom_per_type_flag in line:
                 header_data["max_n_atom_per_type"] = int(lines[i+2].strip())
-                print(f"max_n_atom_per_type: {header_data['max_n_atom_per_type']}")
+                #print(f"max_n_atom_per_type: {header_data['max_n_atom_per_type']}")
             # Reference atomic energy (eV) (single or multiple lines)
             elif self.ref_ene_flag in line:
                 end_idx = self.get_section_end_idx(lines, i, self.star_line)
@@ -119,7 +119,7 @@ class Abn:
                 for j in range(i+2, end_idx):
                     ref_ene.extend([float(x) for x in lines[j].strip().split()])
                 header_data["ref_ene"] = ref_ene
-                print(f"ref_ene: {header_data['ref_ene']}")
+                #print(f"ref_ene: {header_data['ref_ene']}")
             # Atomic mass (single or multiple lines)
             elif self.mass_flag in line:
                 end_idx = self.get_section_end_idx(lines, i, self.star_line)
@@ -127,7 +127,7 @@ class Abn:
                 for j in range(i+2, end_idx):
                     mass.extend([float(x) for x in lines[j].strip().split()])
                 header_data["mass"] = mass
-                print(f"mass: {header_data['mass']}")
+                #print(f"mass: {header_data['mass']}")
             # The numbers of basis sets per atom type (single or multiple lines)
             elif self.n_basis_flag in line:
                 end_idx = self.get_section_end_idx(lines, i, self.star_line)
@@ -135,7 +135,7 @@ class Abn:
                 for j in range(i+2, end_idx):
                     n_basis.extend([int(x) for x in lines[j].strip().split()])
                 header_data["n_basis"] = n_basis
-                print(f"n_basis: {header_data['n_basis']}")
+                #print(f"n_basis: {header_data['n_basis']}")
             # Basis set for each atom type (multiple lines)
             elif self.basis_flag in line:
                 end_idx = self.get_section_end_idx(lines, i, self.star_line)
@@ -147,7 +147,7 @@ class Abn:
                         basis[config_idx] = []
                     basis[config_idx].append(atom_idx)
                 header_data[f"basis_for_{atom_type}"] = basis
-                print(f"basis_for_{atom_type}: {header_data[f'basis_for_{atom_type}']}")
+                #print(f"basis_for_{atom_type}: {header_data[f'basis_for_{atom_type}']}")
             # Stop loading the header data 
             elif self.conf_flag in line:
                 # Get the index of the last line of the header section
@@ -196,68 +196,68 @@ class Abn:
         for i, line in enumerate(lines[conf_section_idx:], start=conf_section_idx):
             # Configuration num.
             if self.conf_flag in line:
-                config_data = {} # Initialize the dictionary for each configuration data
-                config_data["conf_num"] = int(line.strip().split()[-1])
-                print(f"conf_num: {config_data['conf_num']}")
+                result_dict = {} # Initialize the dictionary for each configuration data
+                result_dict["conf_num"] = int(line.strip().split()[-1])
+                #print(f"conf_num: {result_dict['conf_num']}")
             # System name
             elif self.sys_name_flag in line:
-                config_data["sys_name"] = lines[i+2].strip()
-                print(f"sys_name: {config_data['sys_name']}")
+                result_dict["sys_name"] = lines[i+2].strip()
+                #print(f"sys_name: {result_dict['sys_name']}")
             # The number of atom types
             elif self.n_atom_flag in line:
-                config_data["n_atom_type"] = int(lines[i+2].strip())
-                print(f"n_atom_type: {config_data['n_atom_type']}")
+                result_dict["n_atom_type"] = int(lines[i+2].strip())
+                #print(f"n_atom_type: {result_dict['n_atom_type']}")
             # The number of atoms
             elif self.n_atom in line:
-                config_data["n_atom"] = int(lines[i+2].strip())
-                print(f"n_atom: {config_data['n_atom']}")
+                result_dict["n_atom"] = int(lines[i+2].strip())
+                #print(f"n_atom: {result_dict['n_atom']}")
             # Atom types and atom numbers (number of lines = n_atom_type)
             elif self.atom_type_flag in line:
                 atom_type_num = {}
-                for j in range(i+2, i+2+config_data["n_atom_type"]):
+                for j in range(i+2, i+2+result_dict["n_atom_type"]):
                     atom, num = lines[j].strip().split()
                     atom_type_num[atom] = int(num)
-                config_data["atom_type_num"] = atom_type_num
-                print(f"atom_type_num: {config_data['atom_type_num']}")
+                result_dict["atom_type_num"] = atom_type_num
+                #print(f"atom_type_num: {result_dict['atom_type_num']}")
             # CTIFOR
             elif self.ctifor_flag in line:
-                config_data["ctifor"] = lines[i+2].strip()
-                print(f"ctifor: {config_data['ctifor']}")
+                result_dict["ctifor"] = lines[i+2].strip()
+                #print(f"ctifor: {result_dict['ctifor']}")
             # Primitive lattice vectors (ang.) (3 * 3 matrix)
             elif self.vec_flag in line:
                 vectors = []
                 for j in range(i+2, i+5):
                     vectors.append([float(x) for x in lines[j].strip().split()])
-                config_data["vectors"] = vectors
-                print(f"vectors: {config_data['vectors']}")
+                result_dict["vectors"] = vectors
+                #print(f"vectors: {result_dict['vectors']}")
             # Atomic positions (ang.) (n_atom * 3 matrix)
             elif self.pos_flag in line:
                 positions = []
-                for j in range(i+2, i+2+config_data["n_atom"]):
+                for j in range(i+2, i+2+result_dict["n_atom"]):
                     positions.append([float(x) for x in lines[j].strip().split()])
-                config_data["positions"] = positions
-                print(f"positions: {config_data['positions']}")
+                result_dict["positions"] = positions
+                #print(f"positions: {result_dict['positions']}")
             # Total energy (eV)
             elif self.ene_flag in line:
-                config_data["ene"] = float(lines[i+2].strip())
-                print(f"ene: {config_data['ene']}")
+                result_dict["ene"] = float(lines[i+2].strip())
+                #print(f"ene: {result_dict['ene']}")
             # Forces (eV ang.^-1) (n_atom * 3 matrix)
             elif self.force_flag in line:
                 forces = []
-                for j in range(i+2, i+2+config_data["n_atom"]):
+                for j in range(i+2, i+2+result_dict["n_atom"]):
                     forces.append([float(x) for x in lines[j].strip().split()])
-                config_data["forces"] = forces
-                print(f"forces: {config_data['forces']}")
+                result_dict["forces"] = forces
+                #print(f"forces: {result_dict['forces']}")
             # Stress (kbar) (2 lines: diagonal and non-diagonal components)
             elif self.stress_flag in line:
                 stress = []
                 stress.append([float(x) for x in lines[i+4].strip().split()])
                 stress.append([float(x) for x in lines[i+8].strip().split()])
-                config_data["stress"] = stress
-                print(f"stress: {config_data['stress']}")
+                result_dict["stress"] = stress
+                #print(f"stress: {result_dict['stress']}")
 
                 # Append the configuration data to the training data list
-                training_data.append(copy.deepcopy(config_data))
+                training_data.append(copy.deepcopy(result_dict))
 
                 # Continue to the next configuration data
                 continue
