@@ -7,9 +7,9 @@ from module.abn import Abn
 from module.db import Database
 
 file_path = "/LARGE0/gr10563/kai/scripts/abn2db/test/ML_ABN_100-Ce_2L0V_TEST"
-abn = Abn(file_path)
+abn = Abn()
 #abn.read_file()
-header_data, training_data = abn.read_file()
+header_data, training_data = abn.read_abn(file_path)
 
 #Check data
 print("### Header data ###")
@@ -25,5 +25,5 @@ for key, value in training_data[0].items():
 print()
 
 file_name = os.path.basename(file_path)
-db = Database(header_data, training_data, file_name)
-db.write_to_db()
+db = Database()
+db.write_db(header_data, training_data, file_name)
