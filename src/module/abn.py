@@ -1,8 +1,7 @@
 import copy
 
 class Abn:
-    def __init__(self, ml_abn):
-        self.ml_abn = ml_abn
+    def __init__(self):
         self.star_line = "**************************************************"
         self.dash_line = "--------------------------------------------------"
         self.eq_line = "=================================================="
@@ -32,7 +31,7 @@ class Abn:
         self.stress_flag = "Stress (kbar)"
 
     # If data have multiple lines, this function will return the end index of the section
-    def get_section_end_idx(self, lines, start_idx, end_flag):
+    def _get_section_end_idx(self, lines, start_idx, end_flag):
         """
         Args:
             lines (list): List of lines from the loaded file
@@ -46,7 +45,9 @@ class Abn:
                 break
         return end_idx
 
-    def read_file(self):
+    def read_abn(self, ml_abn):
+        self.ml_abn = ml_abn
+
         header_data = {}
         training_data = []
 
@@ -81,7 +82,11 @@ class Abn:
         --------------------------------------------------
                 Contents
         **************************************************
-            REPEAT THE ABOVE STRUCTURE
+            ⋮
+        **************************************************
+            Section title
+        --------------------------------------------------
+                Contents
         **************************************************
 
         Loading of the header data will stop when the first 'Configuration num.' line is encountered.
@@ -97,7 +102,7 @@ class Abn:
                 #print(f"max_n_atom_type: {header_data['max_n_atom_type']}")
             # The atom types in the data file (single or multiple lines)
             elif self.all_atom_type_flag in line:
-                end_idx = self.get_section_end_idx(lines, i, self.star_line)
+                end_idx = self._get_section_end_idx(lines, i, self.star_line)
                 all_atom_type = []
                 for j in range(i+2, end_idx):
                     #print(lines[j].strip().split())
@@ -114,7 +119,7 @@ class Abn:
                 #print(f"max_n_atom_per_type: {header_data['max_n_atom_per_type']}")
             # Reference atomic energy (eV) (single or multiple lines)
             elif self.ref_energy_flag in line:
-                end_idx = self.get_section_end_idx(lines, i, self.star_line)
+                end_idx = self._get_section_end_idx(lines, i, self.star_line)
                 ref_energy = []
                 for j in range(i+2, end_idx):
                     ref_energy.extend([float(x) for x in lines[j].strip().split()])
@@ -122,7 +127,7 @@ class Abn:
                 #print(f"ref_energy: {header_data['ref_energy']}")
             # Atomic mass (single or multiple lines)
             elif self.mass_flag in line:
-                end_idx = self.get_section_end_idx(lines, i, self.star_line)
+                end_idx = self._get_section_end_idx(lines, i, self.star_line)
                 mass = []
                 for j in range(i+2, end_idx):
                     mass.extend([float(x) for x in lines[j].strip().split()])
@@ -130,7 +135,7 @@ class Abn:
                 #print(f"mass: {header_data['mass']}")
             # The numbers of basis sets per atom type (single or multiple lines)
             elif self.n_basis_flag in line:
-                end_idx = self.get_section_end_idx(lines, i, self.star_line)
+                end_idx = self._get_section_end_idx(lines, i, self.star_line)
                 n_basis = []
                 for j in range(i+2, end_idx):
                     n_basis.extend([int(x) for x in lines[j].strip().split()])
@@ -138,7 +143,7 @@ class Abn:
                 #print(f"n_basis: {header_data['n_basis']}")
             # Basis set for each atom type (multiple lines)
             elif self.basis_flag in line:
-                end_idx = self.get_section_end_idx(lines, i, self.star_line)
+                end_idx = self._get_section_end_idx(lines, i, self.star_line)
                 basis = {}
                 atom_type = lines[i].split()[-1]
                 for j in range(i+2, end_idx):
@@ -177,19 +182,33 @@ class Abn:
 
         Example:
         **************************************************
-            Configuration num.
+            Configuration num. int
         ==================================================
-            Section title
+            System name
         --------------------------------------------------
-                Contents
+                str
         ==================================================
-            REPEAT THE ABOVE STRUCTURE
+            ⋮
+        ==================================================
+            The number of atoms
+        --------------------------------------------------
+                int
         **************************************************
             Atom types and atom numbers
         --------------------------------------------------
-                Contents
+                str int (multiple lines)
         ==================================================
-            REPEAT THE ABOVE STRUCTURE
+            ⋮
+        ==================================================
+            Stress (kbar)
+        --------------------------------------------------
+            XX YY ZZ
+        --------------------------------------------------
+        float float float
+        --------------------------------------------------
+            XY YZ ZX
+        --------------------------------------------------
+        float float float
         **************************************************
 
         """
