@@ -5,14 +5,10 @@ from ase.calculators.singlepoint import SinglePointDFTCalculator
 from ase.db import connect
 
 class Database:
-    def __init__(self, header_data, training_data, file_name):
-        self.header_data = header_data
-        self.training_data = training_data
-        self.file_name = file_name
-
+    def __init__(self):
         self.cwd = os.getcwd()
 
-    def make_db(self):
+    def _make_db(self):
         db_path = os.path.join(self.cwd, self.file_name + ".db")
         if os.path.exists(db_path):
             raise FileExistsError(f"{db_path} already exists.")
@@ -21,8 +17,12 @@ class Database:
 
         return db
 
-    def write_to_db(self):
-        db = self.make_db()
+    def write_db(self, header_data, training_data, file_name):
+        self.header_data = header_data
+        self.training_data = training_data
+        self.file_name = file_name
+
+        db = self._make_db()
 
         for result_dict in self.training_data:
             unique_species = list(result_dict["atom_type_num"].keys())
@@ -67,5 +67,5 @@ class Database:
                 atoms,
                 conf_num=conf_num,
                 ctifor=ctifor,
-                data={"basis": basis_dict}
+                data={"basis": basis}
                 )
