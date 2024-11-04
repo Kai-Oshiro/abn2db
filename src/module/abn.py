@@ -13,7 +13,7 @@ class Abn:
         self.all_atom_type_flag = "The atom types in the data file"
         self.max_n_atom_per_sys_flag = "The maximum number of atoms per system"
         self.max_n_atom_per_type_flag = "The maximum number of atoms per atom type"
-        self.ref_ene_flag = "Reference atomic energy (eV)"
+        self.ref_energy_flag = "Reference atomic energy (eV)"
         self.mass_flag = "Atomic mass"
         self.n_basis_flag = "The numbers of basis sets per atom type"
         self.basis_flag = "Basis set for"
@@ -27,7 +27,7 @@ class Abn:
         self.ctifor_flag = "CTIFOR"
         self.vec_flag = "Primitive lattice vectors (ang.)"
         self.pos_flag = "Atomic positions (ang.)"
-        self.ene_flag = "Total energy (eV)"
+        self.energy_flag = "Total energy (eV)"
         self.force_flag = "Forces (eV ang.^-1)"
         self.stress_flag = "Stress (kbar)"
 
@@ -113,13 +113,13 @@ class Abn:
                 header_data["max_n_atom_per_type"] = int(lines[i+2].strip())
                 #print(f"max_n_atom_per_type: {header_data['max_n_atom_per_type']}")
             # Reference atomic energy (eV) (single or multiple lines)
-            elif self.ref_ene_flag in line:
+            elif self.ref_energy_flag in line:
                 end_idx = self.get_section_end_idx(lines, i, self.star_line)
-                ref_ene = []
+                ref_energy = []
                 for j in range(i+2, end_idx):
-                    ref_ene.extend([float(x) for x in lines[j].strip().split()])
-                header_data["ref_ene"] = ref_ene
-                #print(f"ref_ene: {header_data['ref_ene']}")
+                    ref_energy.extend([float(x) for x in lines[j].strip().split()])
+                header_data["ref_energy"] = ref_energy
+                #print(f"ref_energy: {header_data['ref_energy']}")
             # Atomic mass (single or multiple lines)
             elif self.mass_flag in line:
                 end_idx = self.get_section_end_idx(lines, i, self.star_line)
@@ -238,9 +238,9 @@ class Abn:
                 result_dict["positions"] = positions
                 #print(f"positions: {result_dict['positions']}")
             # Total energy (eV)
-            elif self.ene_flag in line:
-                result_dict["ene"] = float(lines[i+2].strip())
-                #print(f"ene: {result_dict['ene']}")
+            elif self.energy_flag in line:
+                result_dict["energy"] = float(lines[i+2].strip())
+                #print(f"energy: {result_dict['energy']}")
             # Forces (eV ang.^-1) (n_atom * 3 matrix)
             elif self.force_flag in line:
                 forces = []
