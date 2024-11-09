@@ -1,4 +1,5 @@
 import os
+import numpy as np
 
 from ase import Atoms
 from ase.calculators.singlepoint import SinglePointDFTCalculator
@@ -116,18 +117,19 @@ class Database:
 
             ctifor = row["ctifor"]
             basis = row.data["basis"]
-            vectors = row.cell
-            positions = row.positions
+            vectors = row.cell.tolist()
+            positions = row.positions.tolist()
             # The "energy" in the ML_ABN file corresponds to the "free energy" in the OUTCAR file, 
             # so it is registered as "free energy" in the atoms object.
             # On the other hand, variables and keys conform to the ML_ABN file 
             # and are represented as "energy".
             energy = row.free_energy
-            forces = row.forces
-            stress = row.stress
+            forces = row.forces.tolist()
+            stress = row.stress.tolist()
 
             training_data.append({
                 "conf_num": conf_num,
+                "sys_name": sys_name,
                 "ctifor": ctifor,
                 "atom_type_num": atom_type_num,
                 "vectors": vectors,
@@ -196,9 +198,5 @@ class Database:
 
         for basis_tag in all_basis.keys():
             header_data[basis_tag] = all_basis[basis_tag]
-
-        print("### Header data ###")
-        for key, value in header_data.items():
-            print(f"{key}: {value}")
 
         return header_data, training_data
