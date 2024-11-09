@@ -45,13 +45,13 @@ class Abn:
                 break
         return end_idx
 
-    def read_abn(self, ml_abn):
-        self.ml_abn = ml_abn
+    def read_abn(self, abn_path):
+        self.abn_path = abn_path
 
         header_data = {}
         training_data = []
 
-        with open(self.ml_abn, 'r') as file:
+        with open(self.abn_path, 'r') as file:
             lines = file.readlines()
 
         # Store file format version from the first line
