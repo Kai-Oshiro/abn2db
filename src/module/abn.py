@@ -294,6 +294,7 @@ class Abn:
         return [lst[i:i+group_size] for i in range(0, len(lst), group_size)]
 
     def _get_width(self, value, part=None):
+        value = abs(float(value))
         if part == "int":
             _width = len(str(int(value)))
         elif part == "float":
@@ -310,6 +311,21 @@ class Abn:
         else:
             _max = max([self._get_width(value) for value in lst])
         return _max
+
+    def _get_exp_notation(self, value, base_float_digits=14):
+        if value == 0 or (isinstance(value, float) and abs(value) < 1):
+            _str_line = f"{value:>23.15E}"
+            # Indicate the exponential portion in 3 digits, default is 2 in Python
+            if "E+" in _str_line:
+                _str_line = _str_line.replace("E+", "E+0")
+            elif "E-" in _str_line:
+                _str_line = _str_line.replace("E-", "E-0")
+        else:
+            # Adjust to 16 digits overall
+            int_width = self._get_width(value, part="int")
+            float_digits = base_float_digits - int_width + 1
+            _str_line = f"{value:>19.{float_digits}f}     "
+        return _str_line
 
     def write_abn(self, header_data, training_data, file_name):
         lines = []
@@ -403,24 +419,6 @@ class Abn:
             content_line = content_line.rstrip()
             lines.append(content_line)
 
-        # Get digits for the number of configurations and atoms
-        all_basis = {}
-        for atom_type in header_data["all_atom_type"]:
-            basis = header_data[f"basis_for_{atom_type}"]
-            for conf_num, atom_idx_list in basis.items():
-                if conf_num in all_basis:
-                    all_basis[conf_num].extend(atom_idx_list)
-                else:
-                    all_basis[conf_num] = atom_idx_list
-        digits_n_conf = self._get_max_width(set(all_basis.keys()))
-        digits_n_atom = self._get_max_width(set([
-            atom_idx 
-            for atom_idx_list in all_basis.values() 
-            for atom_idx in atom_idx_list
-            ]))
-        #print(f"n_conf_set: {digits_n_conf}")
-        #print(f"n_atom_set: {digits_n_atom}")
-
         # Basis set for each atom type
         for atom_type in header_data["all_atom_type"]:
             # Basis set for each atom type
@@ -431,7 +429,7 @@ class Abn:
             basis = header_data[f"basis_for_{atom_type}"]
             for conf_num, atom_idx_list in basis.items():
                 for atom_idx in atom_idx_list:
-                    content_line = f"{space*2}{conf_num:>{digits_n_conf}}{space}{atom_idx:>{digits_n_atom}}"
+                    content_line = f"{space}{conf_num:>6} {atom_idx:>6}"
                     lines.append(content_line)
 
 
@@ -440,7 +438,7 @@ class Abn:
         for data in training_data:
             # Configuration num.
             lines.append(self.star_line)
-            lines.append(f"{space}{self.conf_flag} {data['conf_num']}")
+            lines.append(f"{space}{self.conf_flag}{data['conf_num']:>6}")
 
             # System name
             lines.append(self.eq_line)
@@ -478,10 +476,7 @@ class Abn:
             lines.append(f"{space}{self.ctifor_flag}")
             lines.append(self.dash_line)
             value = data["ctifor"]
-            if value == 0 or (isinstance(value, float) and abs(value) < 1):
-                content_line = f"{value:>23.15E}".replace("E", "E+0")
-            else:
-                content_line = f"{value:>19.14f}"
+            content_line = self._get_exp_notation(value)
             lines.append(f"{content_line}")
 
             # Primitive lattice vectors (ang.)
@@ -491,17 +486,8 @@ class Abn:
             for vector in data["vectors"]:
                 content_line = f""
                 for value in vector:
-                    if value == 0 or (isinstance(value, float) and abs(value) < 1):
-                        _content_line = f"{value:>23.15E}"
-                        if "E+" in _content_line:
-                            _content_line = _content_line.replace("E+", "E+0")
-                        elif "E-" in _content_line:
-                            _content_line = _content_line.replace("E-", "E-0")
-                        content_line += _content_line
-                    else:
-                        int_width = self._get_width(value, part="int")
-                        float_digits = 15 - int_width
-                        content_line += f"{value:>19.{float_digits}f}{space}"
+                    str_line = self._get_exp_notation(value)
+                    content_line += str_line
                 content_line = content_line.rstrip(space)
                 lines.append(content_line)
 
@@ -512,7 +498,8 @@ class Abn:
             for position in data["positions"]:
                 content_line = f""
                 for value in position:
-                    content_line += f"{value:>19}{space}"
+                    str_line = self._get_exp_notation(value)
+                    content_line += str_line
                 content_line = content_line.rstrip(space)
                 lines.append(content_line)
     
@@ -520,7 +507,9 @@ class Abn:
             lines.append(self.star_line)
             lines.append(f"{space}{self.energy_flag}")
             lines.append(self.dash_line)
-            lines.append(f"{space}{data['energy']:>19}")
+            value = data["energy"]
+            content_line = self._get_exp_notation(value)
+            lines.append(f"{content_line}")
     
             # Forces (eV ang.^-1)
             lines.append(self.star_line)
@@ -529,7 +518,8 @@ class Abn:
             for force in data["forces"]:
                 content_line = f""
                 for value in force:
-                    content_line += f"{value:>19}{space}"
+                    str_line = self._get_exp_notation(value)
+                    content_line += str_line
                 content_line = content_line.rstrip(space)
                 lines.append(content_line)
     
@@ -539,11 +529,21 @@ class Abn:
             lines.append(self.dash_line)
             lines.append(f"{space}XX YY ZZ")
             lines.append(self.dash_line)
-            lines.append(f"{space}{data['stress'][0]:>19}{space}{data['stress'][1]:>19}{space}{data['stress'][2]:>19}")
+            content_line = f""
+            for value in data["stress"][0:3]:
+                str_line = self._get_exp_notation(value)
+                content_line += str_line
+            content_line = content_line.rstrip(space)
+            lines.append(content_line)
             lines.append(self.dash_line)
             lines.append(f"{space}XY YZ ZX")
             lines.append(self.dash_line)
-            lines.append(f"{space}{data['stress'][3]:>19}{space}{data['stress'][4]:>19}{space}{data['stress'][5]:>19}")
+            content_line = f""
+            for value in data["stress"][3:]:
+                str_line = self._get_exp_notation(value)
+                content_line += str_line
+            content_line = content_line.rstrip(space)
+            lines.append(content_line)
 
         # print the header data
         for line in lines:
