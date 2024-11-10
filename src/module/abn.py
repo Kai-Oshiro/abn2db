@@ -316,29 +316,23 @@ class Abn:
         space = "     "
 
         # Write the header data
-        version = " 1.0 Version"
-        lines.append(version)
+        lines.append(" 1.0 Version")
 
         # The number of configurations
         lines.append(self.star_line)
-        title_line = f"{space}{self.n_conf_flag}"
-        lines.append(title_line)
+        lines.append(f"{space}{self.n_conf_flag}")
         lines.append(self.dash_line)
-        content_line = f"{space*2}{header_data['n_conf']}"
-        lines.append(content_line)
+        lines.append(f"{space*2}{header_data['n_conf']}")
 
         # The maximum number of atom types
         lines.append(self.star_line)
-        title_line = f"{space}{self.max_n_atom_type_flag}"
-        lines.append(title_line)
+        lines.append(f"{space}{self.max_n_atom_type_flag}")
         lines.append(self.dash_line)
-        content_line = f"{space}{header_data['max_n_atom_type']:>3}"
-        lines.append(content_line)
+        lines.append(f"{space}{header_data['max_n_atom_type']:>3}")
 
         # The atom types in the data file
         lines.append(self.star_line)
-        title_line = f"{space}{self.all_atom_type_flag}"
-        lines.append(title_line)
+        lines.append(f"{space}{self.all_atom_type_flag}")
         lines.append(self.dash_line)
 
         grouped_all_atom_type = self._group_value(header_data["all_atom_type"])
@@ -351,24 +345,19 @@ class Abn:
 
         # The maximum number of atoms per system
         lines.append(self.star_line)
-        title_line = f"{space}{self.max_n_atom_per_sys_flag}"
-        lines.append(title_line)
+        lines.append(f"{space}{self.max_n_atom_per_sys_flag}")
         lines.append(self.dash_line)
-        content_line = f"{space*2}{header_data['max_n_atom_per_sys']:>5}"
-        lines.append(content_line)
+        lines.append(f"{space*2}{header_data['max_n_atom_per_sys']:>5}")
 
         # The maximum number of atoms per atom type
         lines.append(self.star_line)
-        title_line = f"{space}{self.max_n_atom_per_type_flag}"
-        lines.append(title_line)
+        lines.append(f"{space}{self.max_n_atom_per_type_flag}")
         lines.append(self.dash_line)
-        content_line = f"{space*2}{header_data['max_n_atom_per_type']:>5}"
-        lines.append(content_line)
+        lines.append(f"{space*2}{header_data['max_n_atom_per_type']:>5}")
 
         # Reference atomic energy (eV)
         lines.append(self.star_line)
-        title_line = f"{space}{self.ref_energy_flag}"
-        lines.append(title_line)
+        lines.append(f"{space}{self.ref_energy_flag}")
         lines.append(self.dash_line)
 
         max_int_width = self._get_max_width(header_data["ref_energy"], part="int")
@@ -385,8 +374,7 @@ class Abn:
 
         # Atomic mass
         lines.append(self.star_line)
-        title_line = f"{space}{self.mass_flag}"
-        lines.append(title_line)
+        lines.append(f"{space}{self.mass_flag}")
         lines.append(self.dash_line)
 
         max_int_width = self._get_max_width(header_data["mass"], part="int")
@@ -403,8 +391,7 @@ class Abn:
 
         # The numbers of basis sets per atom type
         lines.append(self.star_line)
-        title_line = f"{space}{self.n_basis_flag}"
-        lines.append(title_line)
+        lines.append(f"{space}{self.n_basis_flag}")
         lines.append(self.dash_line)
 
         n_basis = list(header_data["n_basis"].values())
@@ -416,16 +403,31 @@ class Abn:
             content_line = content_line.rstrip()
             lines.append(content_line)
 
+        # Get digits for the number of configurations and atoms
+        all_basis = {}
+        for atom_type in header_data["all_atom_type"]:
+            basis = header_data[f"basis_for_{atom_type}"]
+            for conf_num, atom_idx_list in basis.items():
+                if conf_num in all_basis:
+                    all_basis[conf_num].extend(atom_idx_list)
+                else:
+                    all_basis[conf_num] = atom_idx_list
+        digits_n_conf = self._get_max_width(set(all_basis.keys()))
+        digits_n_atom = self._get_max_width(set([
+            atom_idx 
+            for atom_idx_list in all_basis.values() 
+            for atom_idx in atom_idx_list
+            ]))
+        #print(f"n_conf_set: {digits_n_conf}")
+        #print(f"n_atom_set: {digits_n_atom}")
+
         # Basis set for each atom type
         for atom_type in header_data["all_atom_type"]:
             # Basis set for each atom type
             lines.append(self.star_line)
-            title_line = f"{space}{self.basis_flag} {atom_type}"
-            lines.append(title_line)
+            lines.append(f"{space}{self.basis_flag} {atom_type}")
             lines.append(self.dash_line)
 
-            digits_n_conf = len(str(header_data["n_conf"]))
-            digits_n_atom = len(str(header_data["max_n_atom_per_sys"]))
             basis = header_data[f"basis_for_{atom_type}"]
             for conf_num, atom_idx_list in basis.items():
                 for atom_idx in atom_idx_list:
@@ -438,16 +440,13 @@ class Abn:
         for data in training_data:
             # Configuration num.
             lines.append(self.star_line)
-            title_line = f"{space}{self.conf_flag} {data['conf_num']}"
-            lines.append(title_line)
+            lines.append(f"{space}{self.conf_flag} {data['conf_num']}")
 
             # System name
             lines.append(self.eq_line)
-            title_line = f"{space}{self.sys_name_flag}"
-            lines.append(title_line)
+            lines.append(f"{space}{self.sys_name_flag}")
             lines.append(self.dash_line)
-            content_line = f"{space}{data['sys_name']}"
-            lines.append(content_line)
+            lines.append(f"{space}{data['sys_name']}")
 
             # Get atom info
             n_atom_type = len(data["atom_type_num"])
@@ -455,25 +454,96 @@ class Abn:
 
             # The number of atom types
             lines.append(self.eq_line)
-            title_line = f"{space}{self.n_atom_flag}"
-            lines.append(title_line)
+            lines.append(f"{space}{self.n_atom_flag}")
             lines.append(self.dash_line)
-            content_line = f"{space}{n_atom_type:>3}"
-            lines.append(content_line)
+            lines.append(f"{space}{n_atom_type:>3}")
 
             # The number of atoms
             lines.append(self.eq_line)
-            title_line = f"{space}{self.n_atom_flag}"
-            lines.append(title_line)
+            lines.append(f"{space}{self.n_atom_flag}")
             lines.append(self.dash_line)
-            content_line = f"{space}{n_atom:>6}"
-            lines.append(content_line)
+            lines.append(f"{space}{n_atom:>6}")
 
             # Atom types and atom numbers
             lines.append(self.star_line)
-            title_line = f"{space}{self.atom_type_flag}"
-            lines.append(title_line)
+            lines.append(f"{space}{self.atom_type_flag}")
             lines.append(self.dash_line)
+
+            digits_n_atom = self._get_max_width(data["atom_type_num"].values())
+            for atom, num in data["atom_type_num"].items():
+                lines.append(f"{space}{atom:<2}{space}{num:>{digits_n_atom}}")
+
+            # CTIFOR
+            lines.append(self.eq_line)
+            lines.append(f"{space}{self.ctifor_flag}")
+            lines.append(self.dash_line)
+            value = data["ctifor"]
+            if value == 0 or (isinstance(value, float) and abs(value) < 1):
+                content_line = f"{value:>23.15E}".replace("E", "E+0")
+            else:
+                content_line = f"{value:>19.14f}"
+            lines.append(f"{content_line}")
+
+            # Primitive lattice vectors (ang.)
+            lines.append(self.eq_line)
+            lines.append(f"{space}{self.vec_flag}")
+            lines.append(self.dash_line)
+            for vector in data["vectors"]:
+                content_line = f""
+                for value in vector:
+                    if value == 0 or (isinstance(value, float) and abs(value) < 1):
+                        _content_line = f"{value:>23.15E}"
+                        if "E+" in _content_line:
+                            _content_line = _content_line.replace("E+", "E+0")
+                        elif "E-" in _content_line:
+                            _content_line = _content_line.replace("E-", "E-0")
+                        content_line += _content_line
+                    else:
+                        int_width = self._get_width(value, part="int")
+                        float_digits = 15 - int_width
+                        content_line += f"{value:>19.{float_digits}f}{space}"
+                content_line = content_line.rstrip(space)
+                lines.append(content_line)
+
+            # Atomic positions (ang.)
+            lines.append(self.eq_line)
+            lines.append(f"{space}{self.pos_flag}")
+            lines.append(self.dash_line)
+            for position in data["positions"]:
+                content_line = f""
+                for value in position:
+                    content_line += f"{value:>19}{space}"
+                content_line = content_line.rstrip(space)
+                lines.append(content_line)
+    
+            # Total energy (eV)
+            lines.append(self.star_line)
+            lines.append(f"{space}{self.energy_flag}")
+            lines.append(self.dash_line)
+            lines.append(f"{space}{data['energy']:>19}")
+    
+            # Forces (eV ang.^-1)
+            lines.append(self.star_line)
+            lines.append(f"{space}{self.force_flag}")
+            lines.append(self.dash_line)
+            for force in data["forces"]:
+                content_line = f""
+                for value in force:
+                    content_line += f"{value:>19}{space}"
+                content_line = content_line.rstrip(space)
+                lines.append(content_line)
+    
+            # Stress (kbar)
+            lines.append(self.star_line)
+            lines.append(f"{space}{self.stress_flag}")
+            lines.append(self.dash_line)
+            lines.append(f"{space}XX YY ZZ")
+            lines.append(self.dash_line)
+            lines.append(f"{space}{data['stress'][0]:>19}{space}{data['stress'][1]:>19}{space}{data['stress'][2]:>19}")
+            lines.append(self.dash_line)
+            lines.append(f"{space}XY YZ ZX")
+            lines.append(self.dash_line)
+            lines.append(f"{space}{data['stress'][3]:>19}{space}{data['stress'][4]:>19}{space}{data['stress'][5]:>19}")
 
         # print the header data
         for line in lines:
