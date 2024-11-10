@@ -1,16 +1,30 @@
 #!/usr/bin/env python3
 import os
-
 import ase
+import argparse
 
 from module.abn import Abn
 from module.db import Database
 
-file_path = "/LARGE0/gr10563/kai/scripts/abn2db/test/ML_ABN_100-Ce_2L0V_TEST"
-abn = Abn()
-#abn.read_file()
-header_data, training_data = abn.read_abn(file_path)
+parser = argparse.ArgumentParser()
+# Positional arguments
+parser.add_argument("abn_file", type=str,
+                    help="Path of ML_ABN file to be loaded")
 
+# Optional arguments
+parser.add_argument("-fn", "--file_name", type=str, default=None,
+                    help="Name of new ASE database file.")
+
+# Parse the arguments
+args = parser.parse_args()
+abn_path = args.abn_file
+abn_path = os.path.abspath(abn_path)
+#print(f"db_path: {abn_path}")
+
+abn = Abn()
+header_data, training_data = abn.read_abn(abn_path)
+
+"""
 #Check data
 print("### Header data ###")
 for key, value in header_data.items():
@@ -23,7 +37,20 @@ for key, value in training_data[0].items():
     else:
         print(f"{key}: {value}")
 print()
+"""
 
-file_name = os.path.basename(file_path)
+# Define the path for the new database file
+db_name = args.file_name
+if db_name is None:
+    db_name = os.path.basename(abn_path).split(".")[0]
+db_name = db_name + ".db"
+
+cwd = os.getcwd()
+db_path = os.path.join(cwd, db_name)
+
+# Check if the database file already exists
+if os.path.exists(db_path):
+    raise FileExistsError(f"{db_path} already exists.")
+
 db = Database()
-db.write_db(header_data, training_data, file_name)
+db.write_db(header_data, training_data, db_path)
