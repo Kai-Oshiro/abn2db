@@ -329,7 +329,7 @@ class Abn:
             _str_line = f" {value:>18.{float_digits}f}     "
         return _str_line
 
-    def write_abn(self, header_data, training_data, file_name):
+    def write_abn(self, header_data, training_data, db_path):
         lines = []
         space = "     "
 
@@ -540,7 +540,13 @@ class Abn:
                 content_line += str_line
             lines.append(content_line)
 
+        """
         # print the header data
-        #for line in lines:
-            #print(line)
-        #print()
+        for line in lines:
+            print(line)
+        print()
+        """
+
+        with open(db_path, 'w') as file:
+            for line in lines:
+                file.write(f"{line}\n")
