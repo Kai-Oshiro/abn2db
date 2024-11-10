@@ -90,7 +90,7 @@ class Database:
         header_data = {}
         training_data = []
 
-        count = 1
+        count = 0
         max_n_atom_type = 0
         all_atom_type = []
         max_n_atom_per_sys = 0
@@ -98,8 +98,13 @@ class Database:
         n_basis = {}
         all_basis = {}
         for row in db.select():
+            count += 1
             conf_num = count
-            sys_name = row["sys_name"]
+            try:
+                #sys_name = row["sys_name"] # Both are OK
+                sys_name = row.sys_name
+            except:
+                sys_name = "Undefined"
 
             atoms = row.toatoms()
             species = atoms.get_chemical_symbols()
@@ -115,8 +120,19 @@ class Database:
                     atom_type_num[element] = 1
             #print(f"atom_type_num: {atom_type_num}")
 
-            ctifor = row["ctifor"]
-            basis = row.data["basis"]
+            try:
+                ctifor = row.ctifor
+            except:
+                ctifor = 0.002 # Default value of ML_CTIFOR in VASP
+
+            try:
+                basis = row.data.basis # Dictionary; {element: [basis]}
+            except:
+                basis = {}
+                for element in atom_type_num.keys():
+                    basis[element] = []
+            #print(f"basis: {basis}")
+
             vectors = row.cell.tolist()
             positions = row.positions.tolist()
             # The "energy" in the ML_ABN file corresponds to the "free energy" in the OUTCAR file, 
@@ -172,8 +188,6 @@ class Database:
             if self.mass is None:
                 self.mass = row.data.get("mass", None)
 
-            count += 1
-
         # Set header data
         header_data["n_conf"] = count
         header_data["max_n_atom_type"] = max_n_atom_type
@@ -195,6 +209,7 @@ class Database:
         header_data["mass"] = self.mass
 
         header_data["n_basis"] = n_basis
+        #print(f"n_basis: {n_basis}")
 
         for basis_tag in all_basis.keys():
             header_data[basis_tag] = all_basis[basis_tag]
