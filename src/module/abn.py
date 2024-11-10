@@ -20,8 +20,8 @@ class Abn:
         # Flags for the training data
         self.conf_flag = "Configuration num."
         self.sys_name_flag = "System name"
-        self.n_atom_flag = "The number of atom types"
-        self.n_atom = "The number of atoms"
+        self.n_atom_type_flag = "The number of atom types"
+        self.n_atom_flag = "The number of atoms"
         self.atom_type_flag = "Atom types and atom numbers"
         self.ctifor_flag = "CTIFOR"
         self.vec_flag = "Primitive lattice vectors (ang.)"
@@ -223,11 +223,11 @@ class Abn:
                 result_dict["sys_name"] = lines[i+2].strip()
                 #print(f"sys_name: {result_dict['sys_name']}")
             # The number of atom types
-            elif self.n_atom_flag in line:
+            elif self.n_atom_type_flag in line:
                 result_dict["n_atom_type"] = int(lines[i+2].strip())
                 #print(f"n_atom_type: {result_dict['n_atom_type']}")
             # The number of atoms
-            elif self.n_atom in line:
+            elif self.n_atom_flag in line:
                 result_dict["n_atom"] = int(lines[i+2].strip())
                 #print(f"n_atom: {result_dict['n_atom']}")
             # Atom types and atom numbers (number of lines = n_atom_type)
@@ -313,18 +313,20 @@ class Abn:
         return _max
 
     def _get_exp_notation(self, value, base_float_digits=14):
-        if value == 0 or (isinstance(value, float) and abs(value) < 1):
-            _str_line = f"{value:>23.15E}"
+        if value == 0 or (isinstance(value, float) and abs(value) < 0.1):
+            _str_line = f" {value:>22.15E}"
             # Indicate the exponential portion in 3 digits, default is 2 in Python
             if "E+" in _str_line:
                 _str_line = _str_line.replace("E+", "E+0")
             elif "E-" in _str_line:
                 _str_line = _str_line.replace("E-", "E-0")
+        elif isinstance(value, float) and 0.1 <= abs(value) < 1:
+            _str_line = f" {value:>18.15f}     "
         else:
             # Adjust to 16 digits overall
             int_width = self._get_width(value, part="int")
             float_digits = base_float_digits - int_width + 1
-            _str_line = f"{value:>19.{float_digits}f}     "
+            _str_line = f" {value:>18.{float_digits}f}     "
         return _str_line
 
     def write_abn(self, header_data, training_data, file_name):
@@ -338,7 +340,7 @@ class Abn:
         lines.append(self.star_line)
         lines.append(f"{space}{self.n_conf_flag}")
         lines.append(self.dash_line)
-        lines.append(f"{space*2}{header_data['n_conf']}")
+        lines.append(f"{space}{header_data['n_conf']:>6}")
 
         # The maximum number of atom types
         lines.append(self.star_line)
@@ -363,13 +365,13 @@ class Abn:
         lines.append(self.star_line)
         lines.append(f"{space}{self.max_n_atom_per_sys_flag}")
         lines.append(self.dash_line)
-        lines.append(f"{space*2}{header_data['max_n_atom_per_sys']:>5}")
+        lines.append(f"{space}{header_data['max_n_atom_per_sys']:>10}")
 
         # The maximum number of atoms per atom type
         lines.append(self.star_line)
         lines.append(f"{space}{self.max_n_atom_per_type_flag}")
         lines.append(self.dash_line)
-        lines.append(f"{space*2}{header_data['max_n_atom_per_type']:>5}")
+        lines.append(f"{space}{header_data['max_n_atom_per_type']:>10}")
 
         # Reference atomic energy (eV)
         lines.append(self.star_line)
@@ -381,11 +383,8 @@ class Abn:
         for energy_list in grouped_ref_energy:
             content_line = f""
             for energy in energy_list:
-                int_width = self._get_width(energy, part="int")
-                float_digits = 13 + max_int_width - int_width
-                energy_str = f"{energy:.{float_digits}f}"
-                content_line += f"{energy_str:>19}{space}"
-            content_line = content_line.rstrip(space)
+                str_line = self._get_exp_notation(energy)
+                content_line += str_line
             lines.append(content_line)
 
         # Atomic mass
@@ -398,11 +397,8 @@ class Abn:
         for mass_list in grouped_mass:
             content_line = f""
             for mass in mass_list:
-                int_width = self._get_width(mass, part="int")
-                float_digits = 13 + max_int_width - int_width
-                mass_str = f"{mass:.{float_digits}f}"
-                content_line += f"{mass_str:>19}{space}"
-            content_line = content_line.rstrip(space)
+                str_line = self._get_exp_notation(mass)
+                content_line += str_line
             lines.append(content_line)
 
         # The numbers of basis sets per atom type
@@ -415,6 +411,8 @@ class Abn:
         for n_basis_list in grouped_n_basis:
             content_line = f"{space}"
             for n_basis in n_basis_list:
+                if n_basis == 0: # Handle the case where the basis set is not defined
+                    n_basis = 1 # Set the dummy value
                 content_line += f"{n_basis:>5} "
             content_line = content_line.rstrip()
             lines.append(content_line)
@@ -423,10 +421,13 @@ class Abn:
         for atom_type in header_data["all_atom_type"]:
             # Basis set for each atom type
             lines.append(self.star_line)
-            lines.append(f"{space}{self.basis_flag} {atom_type}")
+            lines.append(f"{space}{self.basis_flag} {atom_type:<2}")
             lines.append(self.dash_line)
 
             basis = header_data[f"basis_for_{atom_type}"]
+            #print(f"atom_type: {atom_type:<2}, basis: {basis}")
+            if not bool(basis): # Check if the basis (dictionary) is empty
+                basis = {1: [1]} # Set the dummy key-value pair
             for conf_num, atom_idx_list in basis.items():
                 for atom_idx in atom_idx_list:
                     content_line = f"{space}{conf_num:>6} {atom_idx:>6}"
@@ -438,13 +439,13 @@ class Abn:
         for data in training_data:
             # Configuration num.
             lines.append(self.star_line)
-            lines.append(f"{space}{self.conf_flag}{data['conf_num']:>6}")
+            lines.append(f"{space}{self.conf_flag} {data['conf_num']:>6}")
 
             # System name
             lines.append(self.eq_line)
             lines.append(f"{space}{self.sys_name_flag}")
             lines.append(self.dash_line)
-            lines.append(f"{space}{data['sys_name']}")
+            lines.append(f"{space}{data['sys_name']:<40}")
 
             # Get atom info
             n_atom_type = len(data["atom_type_num"])
@@ -452,7 +453,7 @@ class Abn:
 
             # The number of atom types
             lines.append(self.eq_line)
-            lines.append(f"{space}{self.n_atom_flag}")
+            lines.append(f"{space}{self.n_atom_type_flag}")
             lines.append(self.dash_line)
             lines.append(f"{space}{n_atom_type:>3}")
 
@@ -467,9 +468,8 @@ class Abn:
             lines.append(f"{space}{self.atom_type_flag}")
             lines.append(self.dash_line)
 
-            digits_n_atom = self._get_max_width(data["atom_type_num"].values())
             for atom, num in data["atom_type_num"].items():
-                lines.append(f"{space}{atom:<2}{space}{num:>{digits_n_atom}}")
+                lines.append(f"{space}{atom:<2} {num:>6}")
 
             # CTIFOR
             lines.append(self.eq_line)
@@ -488,7 +488,6 @@ class Abn:
                 for value in vector:
                     str_line = self._get_exp_notation(value)
                     content_line += str_line
-                content_line = content_line.rstrip(space)
                 lines.append(content_line)
 
             # Atomic positions (ang.)
@@ -500,11 +499,10 @@ class Abn:
                 for value in position:
                     str_line = self._get_exp_notation(value)
                     content_line += str_line
-                content_line = content_line.rstrip(space)
                 lines.append(content_line)
     
             # Total energy (eV)
-            lines.append(self.star_line)
+            lines.append(self.eq_line)
             lines.append(f"{space}{self.energy_flag}")
             lines.append(self.dash_line)
             value = data["energy"]
@@ -512,7 +510,7 @@ class Abn:
             lines.append(f"{content_line}")
     
             # Forces (eV ang.^-1)
-            lines.append(self.star_line)
+            lines.append(self.eq_line)
             lines.append(f"{space}{self.force_flag}")
             lines.append(self.dash_line)
             for force in data["forces"]:
@@ -520,11 +518,10 @@ class Abn:
                 for value in force:
                     str_line = self._get_exp_notation(value)
                     content_line += str_line
-                content_line = content_line.rstrip(space)
                 lines.append(content_line)
     
             # Stress (kbar)
-            lines.append(self.star_line)
+            lines.append(self.eq_line)
             lines.append(f"{space}{self.stress_flag}")
             lines.append(self.dash_line)
             lines.append(f"{space}XX YY ZZ")
@@ -533,7 +530,6 @@ class Abn:
             for value in data["stress"][0:3]:
                 str_line = self._get_exp_notation(value)
                 content_line += str_line
-            content_line = content_line.rstrip(space)
             lines.append(content_line)
             lines.append(self.dash_line)
             lines.append(f"{space}XY YZ ZX")
@@ -542,10 +538,9 @@ class Abn:
             for value in data["stress"][3:]:
                 str_line = self._get_exp_notation(value)
                 content_line += str_line
-            content_line = content_line.rstrip(space)
             lines.append(content_line)
 
         # print the header data
-        for line in lines:
-            print(line)
-        print()
+        #for line in lines:
+            #print(line)
+        #print()
