@@ -10,21 +10,11 @@ class Database:
     def __init__(self):
         self.cwd = os.getcwd()
 
-    def _make_db(self):
-        db_path = os.path.join(self.cwd, self.file_name + ".db")
-        if os.path.exists(db_path):
-            raise FileExistsError(f"{db_path} already exists.")
-
-        db = connect(db_path)
-
-        return db
-
-    def write_db(self, header_data, training_data, file_name):
+    def write_db(self, header_data, training_data, db_path):
         self.header_data = header_data
         self.training_data = training_data
-        self.file_name = file_name
 
-        db = self._make_db()
+        db = connect(db_path)
 
         ref_energy = self.header_data["ref_energy"]
         mass = self.header_data["mass"]
