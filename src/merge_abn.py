@@ -10,14 +10,15 @@ merge_db = os.path.join(script_dir, "merge_db.py")
 
 def convert_abn_to_db(abn_file):
     db_file = abn_file
-    subprocess.run(["python", abn2db, abn_file, "-fn", db_file])
-    return db_file
+    subprocess.run([abn2db, abn_file, "-fn", db_file])
+    return db_file + ".db"
 
 def merge_db_files(db_files, new_db):
-    subprocess.run(["python", merge_db] + db_files + ["-fn", new_db])
+    command = [merge_db] + db_files + ["-fn", new_db]
+    subprocess.run(command)
 
 def convert_db_to_abn(db_file, new_abn):
-    subprocess.run(["python", db2abn, db_file, "-fn", new_abn])
+    subprocess.run([db2abn, db_file, "-fn", new_abn])
 
 def main():
     parser = argparse.ArgumentParser(description="Merge ML_ABN files.")
@@ -37,16 +38,18 @@ def main():
             basename = os.path.basename(abn_file)
             merged_abn += basename + "-"
 
-    merged_db = merged_abn
     db_files = [convert_abn_to_db(abn_file) for abn_file in args.abn_files]
 
+    merged_db = merged_abn 
     merge_db_files(db_files, merged_db)
+
+    merged_db = merged_db + ".db"
     convert_db_to_abn(merged_db, merged_abn)
 
     if args.cleanup:
         for db_file in db_files:
-            os.remove(db_file + ".db")
-        os.remove(merged_db + ".db")
+            os.remove(db_file)
+        os.remove(merged_db)
 
 if __name__ == "__main__":
     main()
