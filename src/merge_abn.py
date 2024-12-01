@@ -26,7 +26,7 @@ def main():
                         help="List of ML_ABN files to merge")
     parser.add_argument("-fn", "--file_name", type=str, default=None,
                         help="Name of new ML_ABN file")
-    parser.add_argument("-c", "--cleanup", action="store_false",
+    parser.add_argument("-sdb", "--save_db", action="store_true",
                         help="Delete intermediate db files")
 
     args = parser.parse_args()
@@ -46,7 +46,8 @@ def main():
     merged_db = merged_db + ".db"
     convert_db_to_abn(merged_db, merged_abn)
 
-    if args.cleanup:
+    print(args.save_db)
+    if not args.save_db:
         for db_file in db_files:
             os.remove(db_file)
         os.remove(merged_db)
