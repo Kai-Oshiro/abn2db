@@ -1,0 +1,15 @@
+
+class Outcar:
+    def __init__(self):
+        n_atom_tag = "NIONS"
+        lattice_tag = "direct lattice vectors"
+        position_tag = "POSITION"
+        force_tag = "TOTAL-FORCE (eV/Angst)"
+        energy_tag = "free  energy   TOTEN  ="
+        stress_tag = "in kB"
+
+    def read_outcar(self, outcar_path):
+        """
+        Read OUTCAR file
+        """
+        pass
