@@ -33,15 +33,18 @@ def main():
 
     args = parser.parse_args()
 
-    abn_file = args.abn_file
-    shuffled_abn = args.file_name if args.file_name else os.path.basename(abn_file).split(".")[0] + "_shuffled"
-    seed = args.seed
+    abn_path = args.abn_file
+    abn_path = os.path.abspath(abn_path)
 
-    db_file = convert_abn_to_db(abn_file)
+    shuffled_abn = args.file_name
+    if shuffled_abn is None:
+        shuffled_abn = os.path.basename(abn_path).split(".")[0] + "_shuffled"
+
+    db_file = convert_abn_to_db(abn_path)
     shuffled_db = shuffled_abn + ".db"
     index_file = shuffled_abn + "_index.txt"
 
-    shuffle_db_file(db_file, shuffled_db, index_file, seed)
+    shuffle_db_file(db_file, shuffled_db, index_file, args.seed)
     convert_db_to_abn(shuffled_db, shuffled_abn)
 
     if not args.save_db:

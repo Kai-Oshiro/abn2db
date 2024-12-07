@@ -25,7 +25,7 @@ def shuffle_db(input_file, output_file, index_file, seed=None):
 
 def main():
     parser = argparse.ArgumentParser(description='Shuffle rows in an ASE database file.')
-    parser.add_argument('input_file', type=str,
+    parser.add_argument('db_file', type=str,
                         help='The input ASE database file.')
     parser.add_argument('-fn', '--file_name', type=str, default=None,
                         help='The new ASE database file with shuffled rows.')
@@ -36,16 +36,24 @@ def main():
     
     args = parser.parse_args()
 
-    if args.file_name is None:
-        args.file_name = args.input_file.split(".")[0] + "_shuffled.db"
+    db_path = args.db_file
+    db_path = os.path.abspath(db_path)
 
-    if not args.file_name.endswith(".db"):
-        args.file_name += ".db"
+    shuffled_db = args.file_name
+    if shuffled_db is None:
+        shuffled_db = os.path.basename(db_path).split(".")[0] + "_shuffled.db"
 
-    if args.index_file is None:
-        args.index_file = args.input_file.split(".")[0] + "_shuffled.txt"
+    if not shuffled_db.endswith(".db"):
+        shuffled_db += ".db"
 
-    shuffle_db(args.input_file, args.file_name, args.index_file, args.seed)
+    idx_file = args.index_file
+    if idx_file is None:
+        idx_file = os.path.basename(db_path).split(".")[0] + "_shuffled.txt"
+
+    if not idx_file.endswith(".txt"):
+        idx_file += ".txt"
+
+    shuffle_db(db_path, shuffled_db, idx_file, args.seed)
 
 if __name__ == '__main__':
     main()
