@@ -18,16 +18,16 @@ args = parser.parse_args()
 db_paths = args.db_files
 
 # Define the path for the new database file
-new_db_name = args.file_name
-if new_db_name is None:
+merged_db = args.file_name
+if merged_db is None:
     base_names = [os.path.basename(db_path).split(".")[0] for db_path in db_paths]
-    new_db_name = "-".join(base_names)
+    merged_db = "-".join(base_names)
 
-if not new_db_name.endswith(".db"):
-    new_db_name = new_db_name + ".db"
+if not merged_db.endswith(".db"):
+    merged_db = merged_db + ".db"
 
 cwd = os.getcwd()
-new_db_path = os.path.join(cwd, new_db_name)
+new_db_path = os.path.join(cwd, merged_db)
 
 # Check if the database file already exists
 if os.path.exists(new_db_path):

@@ -45,7 +45,7 @@ def main():
 
     convert_db_to_abn(merged_db, merged_abn)
 
-    print(args.save_db)
+    #print(args.save_db)
     if not args.save_db:
         for db_file in db_files:
             os.remove(db_file)
