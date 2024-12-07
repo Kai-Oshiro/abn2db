@@ -22,7 +22,9 @@ new_db_name = args.file_name
 if new_db_name is None:
     base_names = [os.path.basename(db_path).split(".")[0] for db_path in db_paths]
     new_db_name = "-".join(base_names)
-new_db_name = new_db_name + ".db"
+
+if not new_db_name.endswith(".db"):
+    new_db_name = new_db_name + ".db"
 
 cwd = os.getcwd()
 new_db_path = os.path.join(cwd, new_db_name)

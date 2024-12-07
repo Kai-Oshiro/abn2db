@@ -43,7 +43,9 @@ print()
 db_name = args.file_name
 if db_name is None:
     db_name = os.path.basename(abn_path).split(".")[0]
-db_name = db_name + ".db"
+
+if not db_name.endswith(".db"):
+    db_name = db_name + ".db"
 
 cwd = os.getcwd()
 db_path = os.path.join(cwd, db_name)

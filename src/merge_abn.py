@@ -9,9 +9,9 @@ db2abn = os.path.join(script_dir, "db2abn.py")
 merge_db = os.path.join(script_dir, "merge_db.py")
 
 def convert_abn_to_db(abn_file):
-    db_file = abn_file
+    db_file = abn_file + ".db"
     subprocess.run([abn2db, abn_file, "-fn", db_file])
-    return db_file + ".db"
+    return db_file
 
 def merge_db_files(db_files, new_db):
     command = [merge_db] + db_files + ["-fn", new_db]
@@ -40,10 +40,9 @@ def main():
 
     db_files = [convert_abn_to_db(abn_file) for abn_file in args.abn_files]
 
-    merged_db = merged_abn 
+    merged_db = merged_abn + ".db"
     merge_db_files(db_files, merged_db)
 
-    merged_db = merged_db + ".db"
     convert_db_to_abn(merged_db, merged_abn)
 
     print(args.save_db)
