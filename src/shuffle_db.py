@@ -19,11 +19,14 @@ def shuffle_db(input_file, output_file, seed=None):
 def main():
     parser = argparse.ArgumentParser(description='Shuffle rows in an ASE database file.')
     parser.add_argument('input_file', type=str, help='The input ASE database file.')
-    parser.add_argument('output_file', type=str, help='The output ASE database file with shuffled rows.')
-    parser.add_argument('--seed', type=int, help='The seed for the random number generator.', default=None)
+    parser.add_argument('-of', '--output_file', type=str, help='The output ASE database file with shuffled rows.', default=None)
+    parser.add_argument('-s', '--seed', type=int, help='The seed for the random number generator.', default=1)
     
     args = parser.parse_args()
-    
+
+    if args.output_file is None:
+        args.output_file = args.input_file.split(".")[0] + "_shuffled.db"
+
     shuffle_db(args.input_file, args.output_file, args.seed)
 
 if __name__ == '__main__':
