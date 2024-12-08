@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
-import argparse
+import os
 import random
+import argparse
 from ase.db import connect
 
 def shuffle_db(input_file, output_file, index_file, seed=None):

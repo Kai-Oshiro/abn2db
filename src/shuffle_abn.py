@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import os
-import subprocess
 import argparse
+import subprocess
 
 script_dir = os.path.dirname(os.path.realpath(__file__))
 abn2db = os.path.join(script_dir, "abn2db.py")
