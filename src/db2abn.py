@@ -6,50 +6,54 @@ import argparse
 from module.abn import Abn
 from module.db import Database
 
-parser = argparse.ArgumentParser()
-# Positional arguments
-parser.add_argument("db_file", type=str,
-                    help="Path of ASE database file to be loaded")
+def main():
+    parser = argparse.ArgumentParser()
+    # Positional arguments
+    parser.add_argument("db_file", type=str,
+                        help="Path of ASE database file to be loaded")
 
-# Optional arguments
-parser.add_argument("-fn", "--file_name", type=str, default=None,
-                    help="Name of new ML_ABN file.")
+    # Optional arguments
+    parser.add_argument("-fn", "--file_name", type=str, default=None,
+                        help="Name of new ML_ABN file.")
 
-# Parse the arguments
-args = parser.parse_args()
-db_path = args.db_file
-db_path = os.path.abspath(db_path)
-#print(f"db_path: {db_path}")
+    # Parse the arguments
+    args = parser.parse_args()
+    db_path = args.db_file
+    db_path = os.path.abspath(db_path)
+    #print(f"db_path: {db_path}")
 
-db = Database()
-header_data, training_data = db.read_db(db_path)
+    db = Database()
+    header_data, training_data = db.read_db(db_path)
 
-"""
-#Check data
-print("### Header data ###")
-for key, value in header_data.items():
-    print(f"{key}: {value}")
-print("\n### Training data ###")
-for key, value in training_data[0].items():
-    if isinstance(value, list):
-        first_value = value[0]
-        print(f"{key}: {[first_value]}")
-    else:
+    """
+    #Check data
+    print("### Header data ###")
+    for key, value in header_data.items():
         print(f"{key}: {value}")
-print()
-"""
+    print("\n### Training data ###")
+    for key, value in training_data[0].items():
+        if isinstance(value, list):
+            first_value = value[0]
+            print(f"{key}: {[first_value]}")
+        else:
+            print(f"{key}: {value}")
+    print()
+    """
 
-# Define the path for the new ML_ABN file
-abn_name = args.file_name
-if abn_name is None:
-    abn_name = os.path.basename(db_path).split(".")[0]
+    # Define the path for the new ML_ABN file
+    abn_name = args.file_name
+    if abn_name is None:
+        abn_name = os.path.basename(db_path).split(".")[0]
 
-cwd = os.getcwd()
-abn_path = os.path.join(cwd, abn_name)
+    cwd = os.getcwd()
+    abn_path = os.path.join(cwd, abn_name)
 
-# Check if the ML_ABN file already exists
-if os.path.exists(abn_path):
-    raise FileExistsError(f"{abn_path} already exists.")
+    # Check if the ML_ABN file already exists
+    if os.path.exists(abn_path):
+        raise FileExistsError(f"{abn_path} already exists.")
 
-abn = Abn()
-abn.write_abn(header_data, training_data, abn_path)
+    abn = Abn()
+    abn.write_abn(header_data, training_data, abn_path)
+
+if __name__ == "__main__":
+    main()
