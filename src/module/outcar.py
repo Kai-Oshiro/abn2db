@@ -56,11 +56,6 @@ class Outcar:
 
                     entire_data.append(step_results)
 
-        #print(f"n_atom: {n_atom}")
-        #print(f"lattice: {lattice}")
-        #print(f"positions: {positions}")
-        #print(f"forces: {forces}")
-        #print(f"energy: {energy}")
-        #print(f"stress: {stress}")
+
 
         return entire_data
