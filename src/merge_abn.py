@@ -22,7 +22,7 @@ def convert_db_to_abn(db_file, new_abn):
 
 def main():
     parser = argparse.ArgumentParser(description="Merge ML_ABN files.")
-    parser.add_argument("abn_files", nargs="+",
+    parser.add_argument("abn_files", type=str, nargs="+",
                         help="List of ML_ABN files to merge")
     parser.add_argument("-fn", "--file_name", type=str, default=None,
                         help="Name of new ML_ABN file")
