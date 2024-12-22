@@ -27,7 +27,7 @@ class Outcar:
 
             if self.start_ionic_step:
                 if self.ionic_step_tag in line:
-                    ionic_step = int(line.split()[2])
+                    ionic_step = int(line.split()[-2])
                     step_results = {"ionic_step": ionic_step}
                     step_results["n_atom"] = n_atom
 
@@ -51,12 +51,16 @@ class Outcar:
                     step_results["energy"] = energy
 
                 if self.stress_tag in line:
-                    stress = [float(x) for x in lines[idx+1].split()[2:8]]
+                    stress = [float(x) for x in lines[idx].split()[2:8]]
                     step_results["stress"] = stress
 
                     entire_data.append(step_results)
 
+        #print(f"n_atom: {n_atom}")
+        #print(f"lattice: {lattice}")
+        #print(f"positions: {positions}")
+        #print(f"forces: {forces}")
+        #print(f"energy: {energy}")
+        #print(f"stress: {stress}")
 
-        print(f"n_atom: {n_atom}")
-        print(f"lattice: {lattice}")
-        print(f"positions: {positions}")
+        return entire_data
