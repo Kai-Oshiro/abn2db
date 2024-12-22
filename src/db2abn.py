@@ -25,21 +25,6 @@ def main():
     db = Database()
     header_data, training_data = db.read_db(db_path)
 
-    """
-    #Check data
-    print("### Header data ###")
-    for key, value in header_data.items():
-        print(f"{key}: {value}")
-    print("\n### Training data ###")
-    for key, value in training_data[0].items():
-        if isinstance(value, list):
-            first_value = value[0]
-            print(f"{key}: {[first_value]}")
-        else:
-            print(f"{key}: {value}")
-    print()
-    """
-
     # Define the path for the new ML_ABN file
     abn_name = args.file_name
     if abn_name is None:
