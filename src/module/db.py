@@ -80,7 +80,7 @@ class Database:
         header_data = {}
         training_data = []
 
-        count = 0
+        conf_num = 0
         max_n_atom_type = 0
         all_atom_type = []
         max_n_atom_per_sys = 0
@@ -88,8 +88,7 @@ class Database:
         n_basis = {}
         all_basis = {}
         for row in db.select():
-            count += 1
-            conf_num = count
+            conf_num += 1
             try:
                 #sys_name = row["sys_name"] # Both are OK
                 sys_name = row.sys_name
@@ -179,7 +178,7 @@ class Database:
                 self.mass = row.data.get("mass", None)
 
         # Set header data
-        header_data["n_conf"] = count
+        header_data["n_conf"] = conf_num
         header_data["max_n_atom_type"] = max_n_atom_type
         header_data["all_atom_type"] = all_atom_type
         header_data["max_n_atom_per_sys"] = max_n_atom_per_sys
