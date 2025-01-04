@@ -2,6 +2,8 @@
 class Outcar:
     def __init__(self):
         self.n_atom_tag = "NIONS"
+        self.n_atom_per_type_tag = "ions per type ="
+        self.system_tag = "POSCAR ="
         self.ionic_step_tag = "Ionic step"
         self.lattice_tag = "direct lattice vectors"
         self.position_tag = "POSITION"
@@ -21,6 +23,9 @@ class Outcar:
         for idx, line in enumerate(lines):
             if self.n_atom_tag in line:
                 n_atom = int(line.split()[-1])
+
+            if self.system_tag in line:
+                sys_name = line.split()[-1]
 
             if self.ionic_step_tag in line:
                 self.start_ionic_step = True
@@ -55,7 +60,5 @@ class Outcar:
                     step_results["stress"] = stress
 
                     entire_data.append(step_results)
-
-
 
         return entire_data
