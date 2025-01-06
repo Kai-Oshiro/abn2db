@@ -6,6 +6,21 @@ import argparse
 from module.outcar import Outcar
 from module.db import Database
 
+def parse_range(range_str):
+    """Parse a range string like '1:3' or '-3:-1' into a list of integers."""
+    if ':' in range_str:
+        start, end = map(int, range_str.split(':'))
+        if start > 0:
+            start -= 1
+        if end < 0:
+            end += 1
+        return list(range(start, end))
+    else:
+        index = int(range_str)
+        if index > 0:
+            index += 1
+        return [index]
+
 def main():
     parser = argparse.ArgumentParser()
     # Positional arguments
@@ -35,19 +50,7 @@ def main():
     if args.ionic_step:
         indices = []
         for ionic_step in args.ionic_step:
-            if ":" in ionic_step:
-                start, end = map(int, ionic_step.split(":"))
-                print(f"start: {start}, end: {end}")
-                if start < 0: pass
-                else: start -= 1
-                if end < 0: end += 1
-                else: pass
-                indices.extend(range(start, end))
-            else:
-                index = int(ionic_step)
-                if index < 0: pass
-                else: index -= 1
-                indices.append(index)
+            indices.extend(parse_range(ionic_step))
 
     all_outcar_data = []
     for outcar_path in outcar_files:
