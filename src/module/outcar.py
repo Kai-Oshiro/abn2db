@@ -1,6 +1,8 @@
+import re
 
 class Outcar:
     def __init__(self):
+        self.atom_type_tag="VRHFIN"
         self.n_atom_tag = "NIONS"
         self.n_atom_per_type_tag = "ions per type ="
         self.system_tag = "POSCAR ="
@@ -20,9 +22,19 @@ class Outcar:
 
         self.start_ionic_step = False
         entire_data = []
+        atom_type = []
         for idx, line in enumerate(lines):
+            if self.atom_type_tag in line:
+                match = re.search(r'=(.*?):', line)
+                atom_type.append(match.group(1))
+                print(f"atom_type: {atom_type}")
+
             if self.n_atom_tag in line:
                 n_atom = int(line.split()[-1])
+
+            if self.n_atom_per_type_tag in line:
+                n_atom_per_type = list(map(int, line.split("=")[1].split()))
+                print(f"n_atom_per_type: {n_atom_per_type}")
 
             if self.system_tag in line:
                 sys_name = line.split()[-1]
@@ -34,7 +46,10 @@ class Outcar:
                 if self.ionic_step_tag in line:
                     ionic_step = int(line.split()[-2])
                     step_results = {"ionic_step": ionic_step}
+                    step_results["atom_type"] = atom_type
                     step_results["n_atom"] = n_atom
+                    step_results["n_atom_per_type"] = n_atom_per_type
+                    step_results["sys_name"] = sys_name
 
                 if self.lattice_tag in line:
                     lattice = []
