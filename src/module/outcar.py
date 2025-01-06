@@ -2,12 +2,13 @@ import re
 
 class Outcar:
     def __init__(self):
-        self.atom_type_tag="VRHFIN"
+        self.atom_type_tag = "VRHFIN"
         self.n_atom_tag = "NIONS"
         self.n_atom_per_type_tag = "ions per type ="
         self.system_tag = "POSCAR ="
+        self.mass_tag = "Mass of Ions in am"
         self.ionic_step_tag = "Ionic step"
-        self.lattice_tag = "direct lattice vectors"
+        self.vectors_tag = "direct lattice vectors"
         self.position_tag = "POSITION"
         self.force_tag = "TOTAL-FORCE (eV/Angst)"
         self.energy_tag = "free  energy   TOTEN  ="
@@ -25,19 +26,21 @@ class Outcar:
         atom_type = []
         for idx, line in enumerate(lines):
             if self.atom_type_tag in line:
-                match = re.search(r'=(.*?):', line)
+                match = re.search(r"=(.*?):", line)
                 atom_type.append(match.group(1))
-                print(f"atom_type: {atom_type}")
 
             if self.n_atom_tag in line:
                 n_atom = int(line.split()[-1])
 
             if self.n_atom_per_type_tag in line:
                 n_atom_per_type = list(map(int, line.split("=")[1].split()))
-                print(f"n_atom_per_type: {n_atom_per_type}")
 
             if self.system_tag in line:
                 sys_name = line.split()[-1]
+
+            if self.mass_tag in line:
+                mass_line = lines[idx+1].split()
+                mass = [float(x) for x in mass_line[2:]]
 
             if self.ionic_step_tag in line:
                 self.start_ionic_step = True
@@ -50,12 +53,13 @@ class Outcar:
                     step_results["n_atom"] = n_atom
                     step_results["n_atom_per_type"] = n_atom_per_type
                     step_results["sys_name"] = sys_name
+                    step_results["mass"] = mass
 
-                if self.lattice_tag in line:
-                    lattice = []
+                if self.vectors_tag in line:
+                    vectors = []
                     for i in range(3):
-                        lattice.append([float(x) for x in lines[idx+i+1].split()[0:3]])
-                    step_results["lattice"] = lattice
+                        vectors.append([float(x) for x in lines[idx+i+1].split()[0:3]])
+                    step_results["vectors"] = vectors
 
                 if self.position_tag in line:
                     positions = []
