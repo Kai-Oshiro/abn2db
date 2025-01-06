@@ -18,12 +18,18 @@ def main():
 
     # Parse the arguments
     args = parser.parse_args()
-    outcar_path = args.outcar_files
-    outcar_path = os.path.abspath(outcar_path)
-    #print(f"outcar_path: {outcar_path}")
 
-    #oc = Outcar()
-    #entire_data = oc.read_outcar(outcar_path)
+    outcar_files = []
+    for outcar_file in args.outcar_files:
+        outcar_files.append(os.path.abspath(outcar_file))
+
+    for outcar_path in outcar_files:
+        oc = Outcar()
+        entire_data = oc.read_outcar(outcar_path)
+
+    last_ionic_step = entire_data[-1]
+    for key, value in last_ionic_step.items():
+        print(f"{key}: {value}")
 
 if __name__ == "__main__":
     main()
