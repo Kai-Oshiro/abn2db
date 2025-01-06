@@ -22,7 +22,7 @@ class Outcar:
             lines = f.readlines()
 
         self.start_ionic_step = False
-        entire_data = []
+        outcar_data = []
         atom_type = []
         for idx, line in enumerate(lines):
             if self.atom_type_tag in line:
@@ -78,6 +78,6 @@ class Outcar:
                     stress = [float(x) for x in lines[idx].split()[2:8]]
                     step_results["stress"] = stress
 
-                    entire_data.append(step_results)
+                    outcar_data.append(step_results)
 
-        return entire_data
+        return outcar_data
