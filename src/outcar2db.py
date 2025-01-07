@@ -64,14 +64,26 @@ def main():
 
         all_outcar_data.extend(data_to_process)
 
-    last_ionic_step = outcar_data[-1]
-    for key, value in last_ionic_step.items():
-        print(f"{key}: {value}")
+    #last_ionic_step = outcar_data[-1]
+    #for key, value in last_ionic_step.items():
+        #print(f"{key}: {value}")
 
     for data in all_outcar_data:
-        print(f"ionic_step: {data['ionic_step']}")
+        print(f"\nionic_step: {data['ionic_step']}")
 
     header_data, training_data = oc.parse_data(all_outcar_data)
+
+    print("\nHeader data:")
+    for key, value in header_data.items():
+        print(f"{key}: {value}")
+
+    print("\nTraining data:")
+    for key, value in training_data[0].items():
+        if key in ["positions", "forces"]:
+            print(f"{key}: {value[0]}")
+        else:
+            print(f"{key}: {value}")
+    print()
 
 if __name__ == "__main__":
     main()
