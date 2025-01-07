@@ -1,3 +1,4 @@
+import os
 import re
 
 class Outcar:
@@ -18,6 +19,9 @@ class Outcar:
         """
         Read OUTCAR file
         """
+
+        file_name = os.path.basename(outcar_path)
+
         with open(outcar_path, 'r') as f:
             lines = f.readlines()
 
@@ -48,7 +52,8 @@ class Outcar:
             if self.start_ionic_step:
                 if self.ionic_step_tag in line:
                     ionic_step = int(line.split()[-2])
-                    step_results = {"ionic_step": ionic_step}
+                    step_results = {"file_name": file_name}
+                    step_results["ionic_step"] = ionic_step
                     step_results["atom_type"] = atom_type
                     step_results["n_atom"] = n_atom
                     step_results["n_atom_per_type"] = n_atom_per_type
@@ -81,3 +86,35 @@ class Outcar:
                     outcar_data.append(step_results)
 
         return outcar_data
+
+
+
+    def parse_data(self, outcar_data):
+        """
+        Parse OUTCAR data
+        """
+
+        header_data = {}
+        training_data = []
+
+        ### ここをアップデートする ###
+        # Extract header data
+        header_data["atom_type"] = outcar_data[0]["atom_type"]
+        header_data["n_atom"] = outcar_data[0]["n_atom"]
+        header_data["n_atom_per_type"] = outcar_data[0]["n_atom_per_type"]
+        header_data["sys_name"] = outcar_data[0]["sys_name"]
+        header_data["mass"] = outcar_data[0]["mass"]
+
+        # Extract training data
+        for step in outcar_data:
+            training_data.append({
+            "ionic_step": step["ionic_step"],
+            "vectors": step["vectors"],
+            "positions": step["positions"],
+            "forces": step["forces"],
+            "energy": step["energy"],
+            "stress": step["stress"]
+            })
+
+        return header_data, training_data
+
