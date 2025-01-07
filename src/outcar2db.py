@@ -28,18 +28,16 @@ def main():
                         help="Ionic step you want to get (e.g., '1:3', '1 3 5' or '-1').\n\
                         To specify a range with negative value,\
                         enclose the range in quotation marks and put leading spaces,\
-                        e.g., \" -3:-1\".")
+                        e.g., \' -3:-1\'.")
 
     # Parse the arguments
     args = parser.parse_args()
 
     outcar_files = []
-    print(args.outcar_files)
     for outcar_file in args.outcar_files:
         outcar_files.append(os.path.abspath(outcar_file))
 
     indices = None
-    print(args.ionic_step)
     if args.ionic_step:
         indices = []
         for ionic_step in args.ionic_step:
@@ -66,12 +64,14 @@ def main():
 
         all_outcar_data.extend(data_to_process)
 
-    #last_ionic_step = outcar_data[-1]
-    #for key, value in last_ionic_step.items():
-        #print(f"{key}: {value}")
+    last_ionic_step = outcar_data[-1]
+    for key, value in last_ionic_step.items():
+        print(f"{key}: {value}")
 
     for data in all_outcar_data:
         print(f"ionic_step: {data['ionic_step']}")
+
+    header_data, training_data = oc.parse_data(all_outcar_data)
 
 if __name__ == "__main__":
     main()
