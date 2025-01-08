@@ -78,12 +78,10 @@ class Abn:
                 "max_n_atom_per_type": 16,
                 "ref_energy": [0.0, 0.0],
                 "mass": [140.115, 16.0],
-                "n_basis": {'Ce': 13, 'O': 19},
-                "basis_for_Ce": {1: [1, 2, 3], ...},
-                "basis_for_O": {1: [9, 10, 11], ...}
+                "n_basis": {'Ce': 10, 'O': 20},
+                "basis_for_Ce": {1: [1, 2, 3, ...], ...},
+                "basis_for_O": {1: [9, 10, 11, ...], ...}
             }
-            "n_basis" is not used in module.db.Database.write_db(),
-            but it is used in module.db.Abn.write_abn().
 
         training_data : list
             A list of dictionaries containing training data.
@@ -92,8 +90,6 @@ class Abn:
                 {
                     "conf_num": 1,
                     "sys_name": "CeO2",
-                    "n_atom_type": 2,
-                    "n_atom": 24,
                     "atom_type_num": {"Ce": 8, "O": 16},
                     "ctifor": 2.000000000000000E-003,
                     "vectors": [[10.0, 0.0, 0.0], [0.0, 10.0, 0.0], [0.0, 0.0, 10.0]],
@@ -472,12 +468,10 @@ class Abn:
                 "max_n_atom_per_type": 16,
                 "ref_energy": [0.0, 0.0],
                 "mass": [140.115, 16.0],
-                "n_basis": {'Ce': 13, 'O': 19},
-                "basis_for_Ce": {1: [1, 2, 3], ...},
-                "basis_for_O": {1: [9, 10, 11], ...}
+                "n_basis": {'Ce': 10, 'O': 20},
+                "basis_for_Ce": {1: [1, 2, 3, ...], ...},
+                "basis_for_O": {1: [9, 10, 11, ...], ...}
             }
-            "n_basis" is not used in module.db.Database.write_db(),
-            but it is used in module.db.Abn.write_abn().
 
         training_data : list
             A list of dictionaries containing training data.
@@ -486,8 +480,6 @@ class Abn:
                 {
                     "conf_num": 1,
                     "sys_name": "CeO2",
-                    "n_atom_type": 2,
-                    "n_atom": 24,
                     "atom_type_num": {"Ce": 8, "O": 16},
                     "ctifor": 0.002,
                     "vectors": [[10.0, 0.0, 0.0], [0.0, 10.0, 0.0], [0.0, 0.0, 10.0]],
