@@ -27,10 +27,12 @@ def main():
     # Define the path for the new database file
     db_name = args.file_name
     if db_name is None:
-        db_name = os.path.basename(abn_path).split(".")[0]
+        db_name = os.path.basename(abn_path)
+        print(db_name)
 
     if not db_name.endswith(".db"):
         db_name = db_name + ".db"
+        print(db_name)
 
     cwd = os.getcwd()
     db_path = os.path.join(cwd, db_name)
