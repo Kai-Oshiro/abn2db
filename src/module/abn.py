@@ -71,17 +71,19 @@ class Abn:
             A dictionary containing header information.
             Example:
             {
-                "n_conf": 100,
+                "n_conf": 3,
                 "max_n_atom_type": 2,
                 "all_atom_type": ["Ce", "O"],
                 "max_n_atom_per_sys": 24,
                 "max_n_atom_per_type": 16,
                 "ref_energy": [0.0, 0.0],
                 "mass": [140.115, 16.0],
-                "n_basis": [1, 1],
-                "basis_for_Ce": {1: [1]},
-                "basis_for_O": {1: [1]}
+                "n_basis": {'Ce': 13, 'O': 19},
+                "basis_for_Ce": {1: [1, 2, 3], ...},
+                "basis_for_O": {1: [9, 10, 11], ...}
             }
+            "n_basis" is not used in module.db.Database.write_db(),
+            but it is used in module.db.Abn.write_abn().
 
         training_data : list
             A list of dictionaries containing training data.
@@ -98,9 +100,10 @@ class Abn:
                     "positions": [[0.0, 0.0, 0.0], [1.0, 1.0, 1.0], ...],
                     "energy": -123.456,
                     "forces": [[0.1, 0.2, 0.3], [-0.1, -0.2, -0.3], ...],
-                    "stress": [0.1, 0.2, 0.3, 0.4, 0.5, 0.6]    # [XX, YY, ZZ, XY, YZ, ZX]
+                    "stress": [0.1, 0.2, 0.3, 0.4, 0.5, 0.6]
                 }
             ]
+            "stress" contains elements in the order XX, YY, ZZ, XY, YZ, ZX.
         """
 
         self.abn_path = abn_path
@@ -462,17 +465,19 @@ class Abn:
             A dictionary containing header information.
             Example:
             {
-                "n_conf": 100,
+                "n_conf": 3,
                 "max_n_atom_type": 2,
                 "all_atom_type": ["Ce", "O"],
                 "max_n_atom_per_sys": 24,
                 "max_n_atom_per_type": 16,
                 "ref_energy": [0.0, 0.0],
                 "mass": [140.115, 16.0],
-                "n_basis": [1, 1],
-                "basis_for_Ce": {1: [1]},
-                "basis_for_O": {1: [1]}
+                "n_basis": {'Ce': 13, 'O': 19},
+                "basis_for_Ce": {1: [1, 2, 3], ...},
+                "basis_for_O": {1: [9, 10, 11], ...}
             }
+            "n_basis" is not used in module.db.Database.write_db(),
+            but it is used in module.db.Abn.write_abn().
 
         training_data : list
             A list of dictionaries containing training data.
@@ -484,14 +489,15 @@ class Abn:
                     "n_atom_type": 2,
                     "n_atom": 24,
                     "atom_type_num": {"Ce": 8, "O": 16},
-                    "ctifor": 2.000000000000000E-003,
+                    "ctifor": 0.002,
                     "vectors": [[10.0, 0.0, 0.0], [0.0, 10.0, 0.0], [0.0, 0.0, 10.0]],
                     "positions": [[0.0, 0.0, 0.0], [1.0, 1.0, 1.0], ...],
                     "energy": -123.456,
                     "forces": [[0.1, 0.2, 0.3], [-0.1, -0.2, -0.3], ...],
-                    "stress": [[0.1, 0.2, 0.3], [0.4, 0.5, 0.6]]    # [[XX YY ZZ], [XY YZ ZX]]
+                    "stress": [0.1, 0.2, 0.3, 0.4, 0.5, 0.6]
                 }
             ]
+            "stress" contains elements in the order XX, YY, ZZ, XY, YZ, ZX.
         """
         lines = []
         space = "     "
@@ -521,7 +527,9 @@ class Abn:
             content_line = f"{space}"
             for atom_type in atom_type_list:
                 content_line += f"{atom_type:<2} "
-            content_line = content_line.rstrip() # Remove the trailing space
+            #content_line = content_line.rstrip() # Remove the trailing space
+            if content_line.endswith(" "):
+                content_line = content_line[:-1] # Remove only one trailing space
             lines.append(content_line)
 
         # The maximum number of atoms per system
