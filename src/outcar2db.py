@@ -30,6 +30,9 @@ def main():
                         enclose the range in quotation marks and put leading spaces,\
                         e.g., \' -3:-1\'.")
 
+    parser.add_argument("-b", "--basis", type=str, nargs="+", default=None,
+                        help="Atom indices for basis set of training data (e.g., '1:3' or '1 3 5').")
+
     # Parse the arguments
     args = parser.parse_args()
 
@@ -53,16 +56,16 @@ def main():
         outcar_data = oc.read_outcar(outcar_path)
 
         if indices:
-            data_to_process = []
+            results = []
             for index in indices:
                 if isinstance(index, slice):
-                    data_to_process.extend(outcar_data[index])
+                    results.extend(outcar_data[index])
                 else:
-                    data_to_process.append(outcar_data[index])
+                    results.append(outcar_data[index])
         else:
-            data_to_process = outcar_data
+            results = outcar_data
 
-        all_outcar_data.extend(data_to_process)
+        all_outcar_data.extend(results)
 
     #last_ionic_step = outcar_data[-1]
     #for key, value in last_ionic_step.items():
@@ -71,7 +74,8 @@ def main():
     for data in all_outcar_data:
         print(f"\nionic_step: {data['ionic_step']}")
 
-    header_data, training_data = oc.parse_data(all_outcar_data)
+    raw_basis = args.basis # list of atom indices
+    header_data, training_data = oc.parse_data(all_outcar_data, raw_basis)
 
     print("\nHeader data:")
     for key, value in header_data.items():
