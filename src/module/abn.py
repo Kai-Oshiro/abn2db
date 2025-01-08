@@ -112,7 +112,7 @@ class Abn:
             lines = file.readlines()
 
         # Store file format version from the first line
-        header_data["version"] = lines[0].strip()
+        #header_data["version"] = lines[0].strip()
 
         """
         Read the header data.
@@ -193,9 +193,12 @@ class Abn:
             # The numbers of basis sets per atom type (single or multiple lines)
             elif self.n_basis_flag in line:
                 end_idx = self._get_section_end_idx(lines, i, self.star_line)
-                n_basis = []
+                basis_list = []
                 for j in range(i+2, end_idx):
-                    n_basis.extend([int(x) for x in lines[j].strip().split()])
+                    basis_list.extend([int(x) for x in lines[j].strip().split()])
+                n_basis = {}
+                for atom_type, n in zip(header_data["all_atom_type"], basis_list):
+                    n_basis[atom_type] = n
                 header_data["n_basis"] = n_basis
 
             # Basis set for each atom type (multiple lines)
@@ -282,16 +285,18 @@ class Abn:
 
             # The number of atom types
             elif self.n_atom_type_flag in line:
-                result_dict["n_atom_type"] = int(lines[i+2].strip())
+                #result_dict["n_atom_type"] = int(lines[i+2].strip())
+                n_atom_type = int(lines[i+2].strip())
 
             # The number of atoms
             elif self.n_atom_flag in line:
-                result_dict["n_atom"] = int(lines[i+2].strip())
+                #result_dict["n_atom"] = int(lines[i+2].strip())
+                n_atom = int(lines[i+2].strip())
 
             # Atom types and atom numbers (number of lines = n_atom_type)
             elif self.atom_type_flag in line:
                 atom_type_num = {}
-                for j in range(i+2, i+2+result_dict["n_atom_type"]):
+                for j in range(i+2, i+2+n_atom_type):
                     atom, num = lines[j].strip().split()
                     atom_type_num[atom] = int(num)
                 result_dict["atom_type_num"] = atom_type_num
@@ -310,7 +315,7 @@ class Abn:
             # Atomic positions (ang.) (n_atom * 3 matrix)
             elif self.pos_flag in line:
                 positions = []
-                for j in range(i+2, i+2+result_dict["n_atom"]):
+                for j in range(i+2, i+2+n_atom):
                     positions.append([float(x) for x in lines[j].strip().split()])
                 result_dict["positions"] = positions
 
@@ -321,7 +326,7 @@ class Abn:
             # Forces (eV ang.^-1) (n_atom * 3 matrix)
             elif self.force_flag in line:
                 forces = []
-                for j in range(i+2, i+2+result_dict["n_atom"]):
+                for j in range(i+2, i+2+n_atom):
                     forces.append([float(x) for x in lines[j].strip().split()])
                 result_dict["forces"] = forces
 
