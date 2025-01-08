@@ -30,13 +30,24 @@ class Abn:
         self.force_flag = "Forces (eV ang.^-1)"
         self.stress_flag = "Stress (kbar)"
 
-    # If data have multiple lines, this function will return the end index of the section
+    # Helper functions for reading the ML_ABN file
     def _get_section_end_idx(self, lines, start_idx, end_flag):
         """
-        Args:
-            lines (list): List of lines from the loaded file
-            start_idx (int): Starting index of the section
-            end_flag (str): Flag to identify the end of the section
+        Get the ending index of a section in the ML_ABN file.
+
+        Parameters
+        ----------
+        lines : list
+            List of lines from the loaded file
+        start_idx : int
+            Starting index of the section
+        end_flag : str
+            Flag to identify the end of the section
+
+        Returns
+        -------
+        end_idx : int
+            Ending index of the section
         """
         end_idx = -1
         for i, line in enumerate(lines[start_idx:], start=start_idx):
@@ -46,6 +57,52 @@ class Abn:
         return end_idx
 
     def read_abn(self, abn_path):
+        """
+        Read the ABN file and extract relevant data.
+
+        Parameters
+        ----------
+        abn_path : str
+            Path to the ABN file to be read.
+
+        Returns
+        -------
+        header_data : dict
+            A dictionary containing header information.
+            Example:
+            {
+                "n_conf": 100,
+                "max_n_atom_type": 2,
+                "all_atom_type": ["Ce", "O"],
+                "max_n_atom_per_sys": 24,
+                "max_n_atom_per_type": 16,
+                "ref_energy": [0.0, 0.0],
+                "mass": [140.115, 16.0],
+                "n_basis": [1, 1],
+                "basis_for_Ce": {1: [1]},
+                "basis_for_O": {1: [1]}
+            }
+
+        training_data : list
+            A list of dictionaries containing training data.
+            Example:
+            [
+                {
+                    "conf_num": 1,
+                    "sys_name": "CeO2",
+                    "n_atom_type": 2,
+                    "n_atom": 24,
+                    "atom_type_num": {"Ce": 8, "O": 16},
+                    "ctifor": 2.000000000000000E-003,
+                    "vectors": [[10.0, 0.0, 0.0], [0.0, 10.0, 0.0], [0.0, 0.0, 10.0]],
+                    "positions": [[0.0, 0.0, 0.0], [1.0, 1.0, 1.0], ...],
+                    "energy": -123.456,
+                    "forces": [[0.1, 0.2, 0.3], [-0.1, -0.2, -0.3], ...],
+                    "stress": [[0.1, 0.2, 0.3], [0.4, 0.5, 0.6]]    # [[XX YY ZZ], [XY YZ ZX]]
+                }
+            ]
+        """
+
         self.abn_path = abn_path
 
         header_data = {}
@@ -56,7 +113,6 @@ class Abn:
 
         # Store file format version from the first line
         header_data["version"] = lines[0].strip()
-        #print(header_data["version"])
 
         """
         Read the header data.
@@ -91,32 +147,33 @@ class Abn:
 
         Loading of the header data will stop when the first 'Configuration num.' line is encountered.
         """
+
+        ### Read the header data ###
         for i, line in enumerate(lines):
             # The number of configurations
             if self.n_conf_flag in line:
                 header_data["n_conf"] = int(lines[i+2].strip())
-                #print(f"n_conf: {header_data['n_conf']}")
+
             # The maximum number of atom types
             elif self.max_n_atom_type_flag in line:
                 header_data["max_n_atom_type"] = int(lines[i+2].strip())
-                #print(f"max_n_atom_type: {header_data['max_n_atom_type']}")
+
             # The atom types in the data file (single or multiple lines)
             elif self.all_atom_type_flag in line:
                 end_idx = self._get_section_end_idx(lines, i, self.star_line)
                 all_atom_type = []
                 for j in range(i+2, end_idx):
-                    #print(lines[j].strip().split())
                     all_atom_type.extend(lines[j].strip().split())
                 header_data["all_atom_type"] = all_atom_type
-                #print(f"all_atom_type: {header_data['all_atom_type']}")
+
             # The maximum number of atoms per system
             elif self.max_n_atom_per_sys_flag in line:
                 header_data["max_n_atom_per_sys"] = int(lines[i+2].strip())
-                #print(f"max_n_atom_per_sys: {header_data['max_n_atom_per_sys']}")
+
             # The maximum number of atoms per atom type
             elif self.max_n_atom_per_type_flag in line:
                 header_data["max_n_atom_per_type"] = int(lines[i+2].strip())
-                #print(f"max_n_atom_per_type: {header_data['max_n_atom_per_type']}")
+
             # Reference atomic energy (eV) (single or multiple lines)
             elif self.ref_energy_flag in line:
                 end_idx = self._get_section_end_idx(lines, i, self.star_line)
@@ -124,7 +181,7 @@ class Abn:
                 for j in range(i+2, end_idx):
                     ref_energy.extend([float(x) for x in lines[j].strip().split()])
                 header_data["ref_energy"] = ref_energy
-                #print(f"ref_energy: {header_data['ref_energy']}")
+
             # Atomic mass (single or multiple lines)
             elif self.mass_flag in line:
                 end_idx = self._get_section_end_idx(lines, i, self.star_line)
@@ -132,7 +189,7 @@ class Abn:
                 for j in range(i+2, end_idx):
                     mass.extend([float(x) for x in lines[j].strip().split()])
                 header_data["mass"] = mass
-                #print(f"mass: {header_data['mass']}")
+
             # The numbers of basis sets per atom type (single or multiple lines)
             elif self.n_basis_flag in line:
                 end_idx = self._get_section_end_idx(lines, i, self.star_line)
@@ -140,7 +197,7 @@ class Abn:
                 for j in range(i+2, end_idx):
                     n_basis.extend([int(x) for x in lines[j].strip().split()])
                 header_data["n_basis"] = n_basis
-                #print(f"n_basis: {header_data['n_basis']}")
+
             # Basis set for each atom type (multiple lines)
             elif self.basis_flag in line:
                 end_idx = self._get_section_end_idx(lines, i, self.star_line)
@@ -152,7 +209,7 @@ class Abn:
                         basis[config_idx] = []
                     basis[config_idx].append(atom_idx)
                 header_data[f"basis_for_{atom_type}"] = basis
-                #print(f"basis_for_{atom_type}: {header_data[f'basis_for_{atom_type}']}")
+
             # Stop loading the header data 
             elif self.conf_flag in line:
                 # Get the index of the last line of the header section
@@ -210,26 +267,27 @@ class Abn:
         --------------------------------------------------
         float float float
         **************************************************
-
         """
+
+        ### Read the training data ###
         for i, line in enumerate(lines[conf_section_idx:], start=conf_section_idx):
             # Configuration num.
             if self.conf_flag in line:
                 result_dict = {} # Initialize the dictionary for each configuration data
                 result_dict["conf_num"] = int(line.strip().split()[-1])
-                #print(f"conf_num: {result_dict['conf_num']}")
+
             # System name
             elif self.sys_name_flag in line:
                 result_dict["sys_name"] = lines[i+2].strip()
-                #print(f"sys_name: {result_dict['sys_name']}")
+
             # The number of atom types
             elif self.n_atom_type_flag in line:
                 result_dict["n_atom_type"] = int(lines[i+2].strip())
-                #print(f"n_atom_type: {result_dict['n_atom_type']}")
+
             # The number of atoms
             elif self.n_atom_flag in line:
                 result_dict["n_atom"] = int(lines[i+2].strip())
-                #print(f"n_atom: {result_dict['n_atom']}")
+
             # Atom types and atom numbers (number of lines = n_atom_type)
             elif self.atom_type_flag in line:
                 atom_type_num = {}
@@ -237,43 +295,42 @@ class Abn:
                     atom, num = lines[j].strip().split()
                     atom_type_num[atom] = int(num)
                 result_dict["atom_type_num"] = atom_type_num
-                #print(f"atom_type_num: {result_dict['atom_type_num']}")
+
             # CTIFOR
             elif self.ctifor_flag in line:
                 result_dict["ctifor"] = lines[i+2].strip()
-                #print(f"ctifor: {result_dict['ctifor']}")
+
             # Primitive lattice vectors (ang.) (3 * 3 matrix)
             elif self.vec_flag in line:
                 vectors = []
                 for j in range(i+2, i+5):
                     vectors.append([float(x) for x in lines[j].strip().split()])
                 result_dict["vectors"] = vectors
-                #print(f"vectors: {result_dict['vectors']}")
+
             # Atomic positions (ang.) (n_atom * 3 matrix)
             elif self.pos_flag in line:
                 positions = []
                 for j in range(i+2, i+2+result_dict["n_atom"]):
                     positions.append([float(x) for x in lines[j].strip().split()])
                 result_dict["positions"] = positions
-                #print(f"positions: {result_dict['positions']}")
+
             # Total energy (eV)
             elif self.energy_flag in line:
                 result_dict["energy"] = float(lines[i+2].strip())
-                #print(f"energy: {result_dict['energy']}")
+
             # Forces (eV ang.^-1) (n_atom * 3 matrix)
             elif self.force_flag in line:
                 forces = []
                 for j in range(i+2, i+2+result_dict["n_atom"]):
                     forces.append([float(x) for x in lines[j].strip().split()])
                 result_dict["forces"] = forces
-                #print(f"forces: {result_dict['forces']}")
+
             # Stress (kbar) (2 lines: diagonal and non-diagonal components)
             elif self.stress_flag in line:
                 stress = []
                 stress.append([float(x) for x in lines[i+4].strip().split()])
                 stress.append([float(x) for x in lines[i+8].strip().split()])
                 result_dict["stress"] = stress
-                #print(f"stress: {result_dict['stress']}")
 
                 # Append the configuration data to the training data list
                 training_data.append(copy.deepcopy(result_dict))
@@ -283,17 +340,48 @@ class Abn:
 
         return header_data, training_data
 
-        #return {"header_data": header_data, "training_data": training_data}
 
+
+    # Helper functions for writing the ML_ABN file
+    # Following functions are designed to reproduce the ML_ABN file format generated by the VASP code.
+    # They were created to verify changes from the original ML_ABN file using "diff" command.
+    # It should not necessarily be required to use this notation...
     def _group_value(self, lst, group_size=3):
         """
-        Args:
-            lst (list): List of values
-            group_size (int): Number of values to group
+        Group the values in a list.
+
+        Parameters
+        ----------
+        lst : list
+            List of values
+        group_size : int
+            Number of values to group
+
+        Returns
+        -------
+        grouped_lst : list
+            List of grouped values
         """
         return [lst[i:i+group_size] for i in range(0, len(lst), group_size)]
 
     def _get_width(self, value, part=None):
+        """
+        Get the width of a value.
+
+        Parameters
+        ----------
+        value : float
+            Value to get the width
+        part : str
+            Part of the value to get the width (int, float)
+            int : Integer part of the value
+            float : Decimal part of the value
+
+        Returns
+        -------
+        _width : int
+            Width of the value
+        """
         value = abs(float(value))
         if part == "int":
             _width = len(str(int(value)))
@@ -304,6 +392,21 @@ class Abn:
         return _width
 
     def _get_max_width(self, lst, part=None):
+        """
+        Get the maximum width of a list of values.
+
+        Parameters
+        ----------
+        lst : list
+            List of values
+        part : str
+            Part of the value to get the width (int, float)
+
+        Returns
+        -------
+        _max : int
+            Maximum width of the values
+        """
         if part == "int":
             _max = max([self._get_width(value, part="int") for value in lst])
         elif part == "float":
@@ -313,6 +416,21 @@ class Abn:
         return _max
 
     def _get_exp_notation(self, value, base_float_digits=14):
+        """
+        Get the value in exponential notation.
+
+        Parameters
+        ----------
+        value : float
+            Value to convert to exponential notation
+        base_float_digits : int
+            Number of digits for the floating point part
+
+        Returns
+        -------
+        _str_line : str
+            Value in exponential notation
+        """
         if value == 0 or (isinstance(value, float) and abs(value) < 0.1):
             _str_line = f" {value:>22.15E}"
             # Indicate the exponential portion in 3 digits, default is 2 in Python
@@ -330,6 +448,46 @@ class Abn:
         return _str_line
 
     def write_abn(self, header_data, training_data, db_path):
+        """
+        Write the header and training data to the ML_ABN file.
+
+        Parameters
+        ----------
+        header_data : dict
+            A dictionary containing header information.
+            Example:
+            {
+                "n_conf": 100,
+                "max_n_atom_type": 2,
+                "all_atom_type": ["Ce", "O"],
+                "max_n_atom_per_sys": 24,
+                "max_n_atom_per_type": 16,
+                "ref_energy": [0.0, 0.0],
+                "mass": [140.115, 16.0],
+                "n_basis": [1, 1],
+                "basis_for_Ce": {1: [1]},
+                "basis_for_O": {1: [1]}
+            }
+
+        training_data : list
+            A list of dictionaries containing training data.
+            Example:
+            [
+                {
+                    "conf_num": 1,
+                    "sys_name": "CeO2",
+                    "n_atom_type": 2,
+                    "n_atom": 24,
+                    "atom_type_num": {"Ce": 8, "O": 16},
+                    "ctifor": 2.000000000000000E-003,
+                    "vectors": [[10.0, 0.0, 0.0], [0.0, 10.0, 0.0], [0.0, 0.0, 10.0]],
+                    "positions": [[0.0, 0.0, 0.0], [1.0, 1.0, 1.0], ...],
+                    "energy": -123.456,
+                    "forces": [[0.1, 0.2, 0.3], [-0.1, -0.2, -0.3], ...],
+                    "stress": [[0.1, 0.2, 0.3], [0.4, 0.5, 0.6]]    # [[XX YY ZZ], [XY YZ ZX]]
+                }
+            ]
+        """
         lines = []
         space = "     "
 
@@ -425,7 +583,7 @@ class Abn:
             lines.append(self.dash_line)
 
             basis = header_data[f"basis_for_{atom_type}"]
-            #print(f"atom_type: {atom_type:<2}, basis: {basis}")
+
             if not bool(basis): # Check if the basis (dictionary) is empty
                 basis = {1: [1]} # Set the dummy key-value pair
             for conf_num, atom_idx_list in basis.items():
@@ -433,9 +591,7 @@ class Abn:
                     content_line = f"{space}{conf_num:>6} {atom_idx:>6}"
                     lines.append(content_line)
 
-
-
-        # Write the training data
+        ### Write the training data ###
         for data in training_data:
             # Configuration num.
             lines.append(self.star_line)
@@ -539,13 +695,6 @@ class Abn:
                 str_line = self._get_exp_notation(value)
                 content_line += str_line
             lines.append(content_line)
-
-        """
-        # print the header data
-        for line in lines:
-            print(line)
-        print()
-        """
 
         with open(db_path, 'w') as file:
             for line in lines:
