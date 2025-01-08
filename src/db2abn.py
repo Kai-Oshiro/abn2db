@@ -20,7 +20,6 @@ def main():
     args = parser.parse_args()
     db_path = args.db_file
     db_path = os.path.abspath(db_path)
-    #print(f"db_path: {db_path}")
 
     db = Database()
     header_data, training_data = db.read_db(db_path)
