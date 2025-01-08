@@ -95,7 +95,35 @@ class Outcar:
 
 
 
-    def parse_data(self, outcar_data):
+def find_atom_by_index(atom_type_num, index):
+    """
+    Given an index, determine which atom it corresponds to.
+
+    Parameters
+    ----------
+    atom_type_num : dict
+        A dictionary containing atom names and their counts.
+        Example: {"Ce": 8, "O": 16}
+    index : int
+
+    Returns
+    -------
+    atom_type : str
+        The atom name corresponding to the given index.
+
+    Raises
+    ------
+    ValueError
+        If the index is out of range.
+    """
+    current_index = 1
+    for atom_type, count in atom_type_num.items():
+        if current_index <= index < current_index + count:
+            return atom_type
+        current_index += count
+    raise ValueError(f"Index {index} is out of range")
+
+    def parse_data(self, outcar_data, raw_basis):
         """
         Parse OUTCAR data
         """
@@ -111,12 +139,12 @@ class Outcar:
         ref_energy = []
         mass = []
         n_basis = []
-        for data in outcar_data:
+        for step_results in outcar_data:
             # Extract header data
-            if data["n_atom_type"] > max_n_atom_type:
-                max_n_atom_type = data["n_atom_type"]
+            if step_results["n_atom_type"] > max_n_atom_type:
+                max_n_atom_type = step_results["n_atom_type"]
 
-            for index, (atom_type, n_atom_per_type) in enumerate(data["atom_type_num"].items()):
+            for index, (atom_type, n_atom_per_type) in enumerate(step_results["atom_type_num"].items()):
                 if atom_type not in all_atom_type:
                     all_atom_type.append(atom_type)
 
@@ -125,38 +153,48 @@ class Outcar:
                 if n_atom_per_type > max_n_atom_per_type:
                     max_n_atom_per_type = n_atom_per_type
 
-                if data["mass"][index] not in mass:
-                    mass.append(data["mass"][index])
+                if step_results["mass"][index] not in mass:
+                    mass.append(step_results["mass"][index])
 
             # Add n_basis related process
+            basis = {} # {atom_type: [indices]}
+            if raw_basis:
+                for i in raw_basis:
+                    atom_type = find_atom_by_index(step_results["atom_type_num"], i)
+                    if atom_type in basis:
+                        basis[atom_type].append(i)
+                    else:
+                        basis[atom_type] = [i]
 
-            if data["n_atom"] > max_n_atom_per_sys:
-                max_n_atom_per_sys = data["n_atom"]
+            ### Obtain n_basis, basis_for_X data ###
 
-            header_data["max_n_atom_type"] = max_n_atom_type
-            header_data["all_atom_type"] = all_atom_type
-            header_data["max_n_atom_per_sys"] = max_n_atom_per_sys
-            header_data["max_n_atom_per_type"] = max_n_atom_per_type
-            header_data["ref_energy"] = ref_energy
-            header_data["mass"] = mass
-            header_data["n_basis"] = n_basis
+            if step_results["n_atom"] > max_n_atom_per_sys:
+                max_n_atom_per_sys = step_results["n_atom"]
 
             # Extract training data
-            result_dict = {"conf_num": count}
-            result_dict["sys_name"] = data["sys_name"]
-            result_dict["n_atom_type"] = data["n_atom_type"]
-            result_dict["n_atom"] = data["n_atom"]
-            result_dict["atom_type_num"] = data["atom_type_num"]
-            result_dict["ctifor"] = 0.002
-            result_dict["vectors"] = data["vectors"]
-            result_dict["positions"] = data["positions"]
-            result_dict["energy"] = data["energy"]
-            result_dict["forces"] = data["forces"]
-            result_dict["stress"] = data["stress"]
+            data = {"conf_num": count}
+            data["sys_name"] = step_results["sys_name"]
+            data["n_atom_type"] = step_results["n_atom_type"]
+            data["n_atom"] = step_results["n_atom"]
+            data["atom_type_num"] = step_results["atom_type_num"]
+            data["ctifor"] = 0.002
+            data["vectors"] = step_results["vectors"]
+            data["positions"] = step_results["positions"]
+            data["energy"] = step_results["energy"]
+            data["forces"] = step_results["forces"]
+            data["stress"] = step_results["stress"]
 
-            training_data.append(result_dict)
+            training_data.append(data)
 
             count += 1
+
+        header_data["max_n_atom_type"] = max_n_atom_type
+        header_data["all_atom_type"] = all_atom_type
+        header_data["max_n_atom_per_sys"] = max_n_atom_per_sys
+        header_data["max_n_atom_per_type"] = max_n_atom_per_type
+        header_data["ref_energy"] = ref_energy
+        header_data["mass"] = mass
+        header_data["n_basis"] = n_basis
 
         return header_data, training_data
 
