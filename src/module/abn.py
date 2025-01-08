@@ -98,7 +98,7 @@ class Abn:
                     "positions": [[0.0, 0.0, 0.0], [1.0, 1.0, 1.0], ...],
                     "energy": -123.456,
                     "forces": [[0.1, 0.2, 0.3], [-0.1, -0.2, -0.3], ...],
-                    "stress": [[0.1, 0.2, 0.3], [0.4, 0.5, 0.6]]    # [[XX YY ZZ], [XY YZ ZX]]
+                    "stress": [0.1, 0.2, 0.3, 0.4, 0.5, 0.6]    # [XX, YY, ZZ, XY, YZ, ZX]
                 }
             ]
         """
@@ -328,8 +328,8 @@ class Abn:
             # Stress (kbar) (2 lines: diagonal and non-diagonal components)
             elif self.stress_flag in line:
                 stress = []
-                stress.append([float(x) for x in lines[i+4].strip().split()])
-                stress.append([float(x) for x in lines[i+8].strip().split()])
+                stress.extend([float(x) for x in lines[i+4].strip().split()])
+                stress.extend([float(x) for x in lines[i+8].strip().split()])
                 result_dict["stress"] = stress
 
                 # Append the configuration data to the training data list
