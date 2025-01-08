@@ -20,7 +20,6 @@ def main():
     args = parser.parse_args()
     abn_path = args.abn_file
     abn_path = os.path.abspath(abn_path)
-    #print(f"db_path: {abn_path}")
 
     abn = Abn()
     header_data, training_data = abn.read_abn(abn_path)
