@@ -11,6 +11,53 @@ class Database:
         self.cwd = os.getcwd()
 
     def write_db(self, header_data, training_data, db_path):
+        """
+        Write the header data and training data to the database file.
+        
+        Parameters
+        ----------
+        header_data : dict
+            A dictionary containing header information.
+            Example:
+            {
+                "n_conf": 3,
+                "max_n_atom_type": 2,
+                "all_atom_type": ["Ce", "O"],
+                "max_n_atom_per_sys": 24,
+                "max_n_atom_per_type": 16,
+                "ref_energy": [0.0, 0.0],
+                "mass": [140.115, 16.0],
+                "n_basis": {'Ce': 13, 'O': 19},
+                "basis_for_Ce": {1: [1, 2, 3], ...},
+                "basis_for_O": {1: [9, 10, 11], ...}
+            }
+            "n_basis" is not used in module.db.Database.write_db(),
+            but it is used in module.db.Abn.write_abn().
+
+        training_data : list
+            A list of dictionaries containing training data.
+            Example:
+            [
+                {
+                    "conf_num": 1,
+                    "sys_name": "CeO2",
+                    "n_atom_type": 2,
+                    "n_atom": 24,
+                    "atom_type_num": {"Ce": 8, "O": 16},
+                    "ctifor": 2.000000000000000E-003,
+                    "vectors": [[10.0, 0.0, 0.0], [0.0, 10.0, 0.0], [0.0, 0.0, 10.0]],
+                    "positions": [[0.0, 0.0, 0.0], [1.0, 1.0, 1.0], ...],
+                    "energy": -123.456,
+                    "forces": [[0.1, 0.2, 0.3], [-0.1, -0.2, -0.3], ...],
+                    "stress": [0.1, 0.2, 0.3, 0.4, 0.5, 0.6]
+                }
+            ]
+            "stress" contains elements in the order XX, YY, ZZ, XY, YZ, ZX.
+            "energy" in the ML_ABN file corresponds to "free energy" in the OUTCAR file and the atoms object.
+
+        db_path : str
+            Path of the database file to be created.
+        """
         self.header_data = header_data
         self.training_data = training_data
 
@@ -71,6 +118,56 @@ class Database:
                 )
 
     def read_db(self, db_path, ref_energy=None, mass=None):
+        """
+        Read the header data and training data from the database file.
+
+        Parameters
+        ----------
+        db_path : str
+            Path of the database file to be read.
+        ref_energy : list, optional
+            Reference energy for each atom type.
+            Default is None.
+        mass : list, optional
+            Mass for each atom type.
+            Default is None.
+
+        Returns
+        -------
+        header_data : dict
+            A dictionary containing header information.
+            Example:
+            {
+                "n_conf": 3,
+                "max_n_atom_type": 2,
+                "all_atom_type": ["Ce", "O"],
+                "max_n_atom_per_sys": 24,
+                "max_n_atom_per_type": 16,
+                "ref_energy": [0.0, 0.0],
+                "mass": [140.115, 16.0],
+                "n_basis": {'Ce': 13, 'O': 19},
+                "basis_for_Ce": {1: [1, 2, 3, ...], ...},
+                "basis_for_O": {1: [9, 10, 11, ...], ...}
+            }
+
+        training_data : list
+            A list of dictionaries containing training data.
+            Example:
+            [
+                {
+                    "conf_num": 1,
+                    "sys_name": "CeO2",
+                    "atom_type_num": {"Ce": 8, "O": 16},
+                    "ctifor": 0.002,
+                    "vectors": [[10.0, 0.0, 0.0], [0.0, 10.0, 0.0], [0.0, 0.0, 10.0]],
+                    "positions": [[0.0, 0.0, 0.0], [1.0, 1.0, 1.0], ...],
+                    "energy": -123.456,
+                    "forces": [[0.1, 0.2, 0.3], [-0.1, -0.2, -0.3], ...],
+                    "stress": [0.1, 0.2, 0.3, 0.4, 0.5, 0.6]
+                }
+            ]
+            "stress" contains elements in the order XX, YY, ZZ, XY, YZ, ZX.
+        """
         self.db_path = db_path
         self.ref_energy = ref_energy
         self.mass = mass
