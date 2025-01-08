@@ -99,7 +99,6 @@ class Database:
             species = atoms.get_chemical_symbols()
             n_atom_type = len(set(species))
             n_atom = len(species)
-            #print(f"conf_num: {conf_num}, sys_name: {sys_name}, n_atom_type: {n_atom_type}, n_atom: {n_atom}")
 
             atom_type_num = {}
             for element in species:
@@ -107,12 +106,6 @@ class Database:
                     atom_type_num[element] += 1
                 else:
                     atom_type_num[element] = 1
-            #print(f"atom_type_num: {atom_type_num}")
-
-            try:
-                ctifor = row.ctifor
-            except:
-                ctifor = 0.002 # Default value of ML_CTIFOR in VASP
 
             try:
                 basis = row.data.basis # Dictionary; {element: [basis]}
@@ -120,7 +113,11 @@ class Database:
                 basis = {}
                 for element in atom_type_num.keys():
                     basis[element] = []
-            #print(f"basis: {basis}")
+
+            try:
+                ctifor = row.ctifor
+            except:
+                ctifor = 0.002 # Default value of ML_CTIFOR in VASP
 
             vectors = row.cell.tolist()
             positions = row.positions.tolist()
@@ -135,8 +132,8 @@ class Database:
             training_data.append({
                 "conf_num": conf_num,
                 "sys_name": sys_name,
-                "ctifor": ctifor,
                 "atom_type_num": atom_type_num,
+                "ctifor": ctifor,
                 "vectors": vectors,
                 "positions": positions,
                 "energy": energy,
@@ -198,7 +195,6 @@ class Database:
         header_data["mass"] = self.mass
 
         header_data["n_basis"] = n_basis
-        #print(f"n_basis: {n_basis}")
 
         for basis_tag in all_basis.keys():
             header_data[basis_tag] = all_basis[basis_tag]
