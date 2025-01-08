@@ -20,19 +20,11 @@ class Database:
             A dictionary containing header information.
             Example:
             {
-                "n_conf": 3,
-                "max_n_atom_type": 2,
-                "all_atom_type": ["Ce", "O"],
-                "max_n_atom_per_sys": 24,
-                "max_n_atom_per_type": 16,
                 "ref_energy": [0.0, 0.0],
                 "mass": [140.115, 16.0],
-                "n_basis": {'Ce': 13, 'O': 19},
-                "basis_for_Ce": {1: [1, 2, 3], ...},
-                "basis_for_O": {1: [9, 10, 11], ...}
+                "basis_for_Ce": {1: [1, 2, 3, ...], ...},
+                "basis_for_O": {1: [9, 10, 11, ...], ...}
             }
-            "n_basis" is not used in module.db.Database.write_db(),
-            but it is used in module.db.Abn.write_abn().
 
         training_data : list
             A list of dictionaries containing training data.
@@ -41,8 +33,6 @@ class Database:
                 {
                     "conf_num": 1,
                     "sys_name": "CeO2",
-                    "n_atom_type": 2,
-                    "n_atom": 24,
                     "atom_type_num": {"Ce": 8, "O": 16},
                     "ctifor": 2.000000000000000E-003,
                     "vectors": [[10.0, 0.0, 0.0], [0.0, 10.0, 0.0], [0.0, 0.0, 10.0]],
@@ -53,10 +43,32 @@ class Database:
                 }
             ]
             "stress" contains elements in the order XX, YY, ZZ, XY, YZ, ZX.
-            "energy" in the ML_ABN file corresponds to "free energy" in the OUTCAR file and the atoms object.
 
         db_path : str
             Path of the database file to be created.
+
+        Notes
+        -----
+        Each "row" in the ase database file contains the following information:
+        {
+            "sys_name": "CeO2",
+            "conf_num": 1,
+            "ctifor": 0.002,
+            "numbers": [58, ..., 58, 8, ..., 8],
+            "positions": [[0.0, 0.0, 0.0], [1.0, 1.0, 1.0], ...],
+            "cell": [[10.0, 0.0, 0.0], [0.0, 10.0, 0.0], [0.0, 0.0, 10.0]],
+            "pbc": [True, True, True],
+            "calculator": "vasp",
+            "free_energy": -123.456,
+            "forces": [[0.1, 0.2, 0.3], [-0.1, -0.2, -0.3], ...],
+            "stress": [0.1, 0.2, 0.3, 0.4, 0.5, 0.6],
+
+            "data": {
+                "basis": {"Ce": [1, 2, 3, ...], "O": [9, 10, 11, ...]},
+                "ref_energy": [0.0, 0.0],
+                "mass": [140.115, 16.0]
+                }
+        }
         """
         self.header_data = header_data
         self.training_data = training_data
@@ -65,11 +77,10 @@ class Database:
 
         ref_energy = self.header_data["ref_energy"]
         mass = self.header_data["mass"]
-        for result_dict in self.training_data:
-            unique_species = list(result_dict["atom_type_num"].keys())
-            species = [key for key, count in result_dict["atom_type_num"].items() for _ in range(count)]
-            vectors = result_dict["vectors"]
-            positions = result_dict["positions"]
+        for data in self.training_data:
+            species = [key for key, count in data["atom_type_num"].items() for _ in range(count)]
+            vectors = data["vectors"]
+            positions = data["positions"]
 
             atoms = Atoms(
                 species,
@@ -78,9 +89,9 @@ class Database:
                 pbc=True
                 )
 
-            free_energy = result_dict["energy"]
-            forces = result_dict["forces"]
-            stress = result_dict["stress"]
+            free_energy = data["energy"]
+            forces = data["forces"]
+            stress = data["stress"]
 
             calculator = SinglePointDFTCalculator(
                 atoms,
@@ -92,12 +103,13 @@ class Database:
             atoms.set_calculator(calculator)
             atoms.calc.name = "vasp"
 
-            sys_name = str(result_dict["sys_name"])
-            conf_num = int(result_dict["conf_num"])
-            ctifor = float(result_dict["ctifor"])
+            sys_name = str(data["sys_name"])
+            conf_num = int(data["conf_num"])
+            ctifor = float(data["ctifor"])
 
             basis = {}
-            for element in unique_species:
+            atom_type = list(data["atom_type_num"].keys())
+            for element in atom_type:
                 basis_key = f"basis_for_{element}"
                 if basis_key in self.header_data:
                     basis_value = self.header_data[basis_key].get(conf_num, [])
@@ -116,6 +128,8 @@ class Database:
                     "mass": mass
                     }
                 )
+
+
 
     def read_db(self, db_path, ref_energy=None, mass=None):
         """
@@ -145,7 +159,7 @@ class Database:
                 "max_n_atom_per_type": 16,
                 "ref_energy": [0.0, 0.0],
                 "mass": [140.115, 16.0],
-                "n_basis": {'Ce': 13, 'O': 19},
+                "n_basis": {'Ce': 10, 'O': 20},
                 "basis_for_Ce": {1: [1, 2, 3, ...], ...},
                 "basis_for_O": {1: [9, 10, 11, ...], ...}
             }
