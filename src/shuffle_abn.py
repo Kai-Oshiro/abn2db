@@ -22,12 +22,17 @@ def convert_db_to_abn(db_file, new_abn):
 
 def main():
     parser = argparse.ArgumentParser(description="Shuffle data in an ML_ABN file.")
+    # Positional arguments
     parser.add_argument("abn_file", type=str,
                         help="ML_ABN file to shuffle")
+
+    # Optional arguments
     parser.add_argument("-fn", "--file_name", type=str, default=None,
                         help="Name of new shuffled ML_ABN file")
+
     parser.add_argument("-s", "--seed", type=int, default=1,
                         help="Seed for the random number generator")
+
     parser.add_argument("-sd", "--save_db", action="store_true",
                         help="Save intermediate db files")
 
@@ -47,6 +52,7 @@ def main():
     shuffle_db_file(db_file, shuffled_db, index_file, args.seed)
     convert_db_to_abn(shuffled_db, shuffled_abn)
 
+    # Delete intermediate db files
     if not args.save_db:
         os.remove(db_file)
         os.remove(shuffled_db)
