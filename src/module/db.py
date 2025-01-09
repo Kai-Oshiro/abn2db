@@ -40,7 +40,8 @@ class Database:
                     "energy": -123.456,
                     "forces": [[0.1, 0.2, 0.3], [-0.1, -0.2, -0.3], ...],
                     "stress": [0.1, 0.2, 0.3, 0.4, 0.5, 0.6]
-                }
+                },
+                ...
             ]
             "stress" contains elements in the order XX, YY, ZZ, XY, YZ, ZX.
 
@@ -108,8 +109,8 @@ class Database:
             ctifor = float(data["ctifor"])
 
             basis = {}
-            atom_type = list(data["atom_type_num"].keys())
-            for element in atom_type:
+            element_list = list(data["atom_type_num"].keys())
+            for element in element_list:
                 basis_key = f"basis_for_{element}"
                 if basis_key in self.header_data:
                     basis_value = self.header_data[basis_key].get(conf_num, [])
@@ -178,7 +179,8 @@ class Database:
                     "energy": -123.456,
                     "forces": [[0.1, 0.2, 0.3], [-0.1, -0.2, -0.3], ...],
                     "stress": [0.1, 0.2, 0.3, 0.4, 0.5, 0.6]
-                }
+                },
+                ...
             ]
             "stress" contains elements in the order XX, YY, ZZ, XY, YZ, ZX.
         """
