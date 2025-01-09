@@ -1,7 +1,7 @@
 # abn2db
 ## Overview
 
-The `abn2db` library is a collection of Python scripts designed to handle the conversion, merging, and shuffling of training data in ML_ABN files. These scripts facilitate the manipulation of data files used in machine learning workflows.
+`abn2db` library is a collection of Python scripts designed to handle the conversion, merging, and shuffling of training data in ML_ABN files. These scripts facilitate the manipulation of data files used in machine learning workflows.
 
 > Please note that this code may be verbose and not optimized, which could result in longer processing times for merging large ML_ABN files. 
 > 
@@ -9,7 +9,7 @@ The `abn2db` library is a collection of Python scripts designed to handle the co
 
 ## Scripts
 
-The following script allows checking arguments using the `-h` flag.
+Followings script allows checking arguments using the `-h` flag.
 
 ### merge_abn.py
 
@@ -68,4 +68,4 @@ This will create a local copy of the repository in your specified directory.
 
 ## License
 
-This project is licensed under the <XXX> License.
+This project is licensed under the ~~~ License.
