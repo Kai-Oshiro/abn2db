@@ -79,12 +79,12 @@ class Database:
         ref_energy = self.header_data["ref_energy"]
         mass = self.header_data["mass"]
         for data in self.training_data:
-            species = [key for key, count in data["atom_type_num"].items() for _ in range(count)]
+            chemical_symbols = [element for element, n in data["atom_type_num"].items() for _ in range(n)]
             vectors = data["vectors"]
             positions = data["positions"]
 
             atoms = Atoms(
-                species,
+                chemical_symbols,
                 cell=vectors,
                 positions=positions,
                 pbc=True
@@ -209,12 +209,12 @@ class Database:
                 sys_name = "Undefined"
 
             atoms = row.toatoms()
-            species = atoms.get_chemical_symbols()
-            n_atom_type = len(set(species))
-            n_atom = len(species)
+            chemical_symbols = atoms.get_chemical_symbols()
+            n_atom_type = len(set(chemical_symbols))
+            n_atom = len(chemical_symbols)
 
             atom_type_num = {}
-            for element in species:
+            for element in chemical_symbols:
                 if element in atom_type_num:
                     atom_type_num[element] += 1
                 else:
