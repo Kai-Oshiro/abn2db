@@ -3,17 +3,13 @@
 
 The `abn2db` library is a collection of Python scripts designed to handle the conversion, merging, and shuffling of training data in ML_ABN files. These scripts facilitate the manipulation of data files used in machine learning workflows.
 
-"""
-Please note that this code may be verbose and not optimized, which could result in longer processing times for merging large ML_ABN files. 
-
-For a potentially more efficient solution, you might consider using the pymlff library available at https://github.com/utf/pymlff.
-"""
+> Please note that this code may be verbose and not optimized, which could result in longer processing times for merging large ML_ABN files. 
+> 
+> For a potentially more efficient solution, you might consider using the pymlff library available at [https://github.com/utf/pymlff](https://github.com/utf/pymlff).
 
 ## Scripts
 
-"""
-Following script allows checking arguments using the -h flag.
-"""
+The following script allows checking arguments using the `-h` flag.
 
 ### merge_abn.py
 
@@ -61,20 +57,14 @@ python shuffle_abn.py <abn_file> [-fn <file_name>] [-s <seed>] [-sd]
 
 ## Installation
 
-/**
- * This function demonstrates how to clone the repository from GitHub.
- * 
- * To clone the repository, follow these steps:
- * 1. Open your terminal or command prompt.
- * 2. Navigate to the directory where you want to clone the repository.
- * 3. Run the following command:
- * 
- *    ```sh
- *    git clone https://github.com/Kai-Oshiro/abn2db.git
- *    ```
- * 
- * This will create a local copy of the repository in your specified directory.
- */
+To clone the repository, follow these steps:
+1. Open your terminal or command prompt.
+2. Navigate to the directory where you want to clone the repository.
+3. Run the following command:
+    ```sh
+    git clone https://github.com/Kai-Oshiro/abn2db.git
+    ```
+This will create a local copy of the repository in your specified directory.
 
 ## License
 
