@@ -30,7 +30,7 @@ def main():
     parser.add_argument("-fn", "--file_name", type=str, default=None,
                         help="Name of new ML_ABN file")
 
-    parser.add_argument("-sdb", "--save_db", action="store_true",
+    parser.add_argument("-sd", "--save_db", action="store_true",
                         help="Delete intermediate db files")
 
     args = parser.parse_args()
