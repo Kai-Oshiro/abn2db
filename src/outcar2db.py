@@ -71,17 +71,6 @@ def main():
 
         all_outcar_data.extend(results)
 
-    print()
-    last_ionic_step = outcar_data[-1]
-    for key, value in last_ionic_step.items():
-        if key in ["positions", "forces"]:
-            print(f"{key}: {value[0]}")
-        else:
-            print(f"{key}: {value}")
-
-    for data in all_outcar_data:
-        print(f"\nionic_step: {data['ionic_step']}")
-
     if args.basis:
         raw_basis = get_indices(args.basis) # list of atom indices
     else:
@@ -89,17 +78,24 @@ def main():
 
     header_data, training_data = oc.parse_data(all_outcar_data, raw_basis)
 
-    print("\nHeader data:")
-    for key, value in header_data.items():
-        print(f"{key}: {value}")
+    # Define the path for the new database file
+    db_name = args.file_name
+    if db_name is None:
+        db_name = os.path.basename(outcar_files[0])
 
-    print("\nTraining data:")
-    for key, value in training_data[0].items():
-        if key in ["positions", "forces"]:
-            print(f"{key}: {value[0]}")
-        else:
-            print(f"{key}: {value}")
-    print()
+    if not db_name.endswith(".db"):
+        db_name = db_name + ".db"
+
+    cwd = os.getcwd()
+    db_path = os.path.join(cwd, db_name)
+
+    # Check if the database file already exists
+    if os.path.exists(db_path):
+        raise FileExistsError(f"{db_path} already exists.")
+
+    # Write the database
+    db = Database()
+    db.write_db(header_data, training_data, db_path)
 
 if __name__ == "__main__":
     main()
