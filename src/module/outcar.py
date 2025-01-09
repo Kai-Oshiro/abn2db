@@ -192,13 +192,16 @@ class Outcar:
             A dictionary containing header data.
             Example:
             {
+                "n_conf": 1,
                 "max_n_atom_type": 2,
                 "all_atom_type": ["Ce", "O"],
                 "max_n_atom_per_sys": 144,
                 "max_n_atom_per_type": 96,
                 "ref_energy": [0.0, 0.0],
                 "mass": [140.115, 16.0],
-                "n_basis": []
+                "n_basis": {'Ce': 1, 'O': 1},
+                "basis_for_Ce": {1: [1]},
+                "basis_for_O": {1: [1]}
             }
 
         training_data : list
@@ -301,6 +304,7 @@ class Outcar:
             conf_num += 1
 
         # Set header data
+        header_data["n_conf"] = conf_num - 1
         header_data["max_n_atom_type"] = max_n_atom_type
         header_data["all_atom_type"] = all_atom_type
         header_data["max_n_atom_per_sys"] = max_n_atom_per_sys
