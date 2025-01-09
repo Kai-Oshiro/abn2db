@@ -9,7 +9,7 @@
 
 ## Scripts
 
-Followings script allows checking arguments using the `-h` flag.
+Following scripts allow checking arguments using the `-h` flag.
 
 ### merge_abn.py
 
@@ -57,7 +57,7 @@ python shuffle_abn.py <abn_file> [-fn <file_name>] [-s <seed>] [-sd]
 
 ## Installation
 
-To clone the repository, follow these steps:
+To clone this repository, follow these steps:
 1. Open your terminal or command prompt.
 2. Navigate to the directory where you want to clone the repository.
 3. Run the following command:
