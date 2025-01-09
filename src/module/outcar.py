@@ -7,7 +7,7 @@ class Outcar:
         self.n_atom_tag = "NIONS"
         self.n_atom_per_type_tag = "ions per type ="
         self.system_tag = "POSCAR ="
-        self.mass_tag = "Mass of Ions in am"
+        self.mass_tag = "mass and valenz"
         self.ionic_step_tag = "Ionic step"
         self.vectors_tag = "direct lattice vectors"
         self.position_tag = "POSITION"
@@ -18,6 +18,35 @@ class Outcar:
     def read_outcar(self, outcar_path):
         """
         Read OUTCAR file
+
+        Parameters
+        ----------
+        outcar_path : str
+            The path to the OUTCAR file.
+
+        Returns
+        -------
+        outcar_data : list
+            A list of dictionaries containing OUTCAR data.
+            Example: 
+            [
+                {
+                    "file_name": "OUTCAR_00",
+                    "ionic_step": 1,
+                    "n_atom": 144,
+                    "n_atom_type": 2,
+                    "atom_type_num": {"Ce": 48, "O": 96},
+                    "sys_name": "CeO2",
+                    "mass": [140.115, 16.0],
+                    "stress": [0.1, 0.2, 0.3, 0.4, 0.5, 0.6],
+                    "vectors": [[10.0, 0.0, 0.0], [0.0, 10.0, 0.0], [0.0, 0.0, 10.0]],
+                    "positions": [[0.0, 0.0, 0.0], [1.0, 1.0, 1.0], ...],
+                    "forces": [[0.1, 0.2, 0.3], [-0.1, -0.2, -0.3], ...],
+                    "energy": -1234.5678,
+                },
+                ...
+            ]
+            "stress" contains elements in the order XX, YY, ZZ, XY, YZ, ZX.
         """
 
         file_name = os.path.basename(outcar_path)
@@ -27,11 +56,12 @@ class Outcar:
 
         self.start_ionic_step = False
         outcar_data = []
-        atom_type = []
+        element_list = []
+        mass = []
         for idx, line in enumerate(lines):
             if self.atom_type_tag in line:
                 match = re.search(r"=(.*?):", line)
-                atom_type.append(match.group(1))
+                element_list.append(match.group(1))
 
             if self.n_atom_tag in line:
                 n_atom = int(line.split()[-1])
@@ -39,18 +69,19 @@ class Outcar:
             if self.n_atom_per_type_tag in line:
                 n_atom_per_type = list(map(int, line.split("=")[1].split()))
 
-                if len(atom_type) != len(n_atom_per_type):
+                if len(element_list) != len(n_atom_per_type):
                     raise ValueError("Number of atom types and number of atoms per type do not match.")
                 else:
-                    n_atom_type = len(atom_type)
-                    atom_type_num = dict(zip(atom_type, n_atom_per_type))
+                    n_atom_type = len(element_list)
+                    atom_type_num = dict(zip(element_list, n_atom_per_type))
 
             if self.system_tag in line:
-                sys_name = line.split()[-1]
+                sys_name = line.replace(self.system_tag, "").strip()
 
             if self.mass_tag in line:
-                mass_line = lines[idx+1].split()
-                mass = [float(x) for x in mass_line[2:]]
+                mass_line = lines[idx].split(";")[0]
+                mass_line = mass_line.replace("POMASS =", "").strip()
+                mass.append(float(mass_line))
 
             if self.ionic_step_tag in line:
                 self.start_ionic_step = True
@@ -95,58 +126,134 @@ class Outcar:
 
 
 
-def find_atom_by_index(atom_type_num, index):
-    """
-    Given an index, determine which atom it corresponds to.
+    def find_atom_by_index(self, atom_type_num, index):
+        """
+        Given an index, determine which atom it corresponds to.
 
-    Parameters
-    ----------
-    atom_type_num : dict
-        A dictionary containing atom names and their counts.
-        Example: {"Ce": 8, "O": 16}
-    index : int
+        Parameters
+        ----------
+        atom_type_num : dict
+            A dictionary containing atom names and their counts.
+            Example: {"Ce": 8, "O": 16}
+        index : int
 
-    Returns
-    -------
-    atom_type : str
-        The atom name corresponding to the given index.
+        Returns
+        -------
+        element : str
+            The atom name corresponding to the given index.
 
-    Raises
-    ------
-    ValueError
-        If the index is out of range.
-    """
-    current_index = 1
-    for atom_type, count in atom_type_num.items():
-        if current_index <= index < current_index + count:
-            return atom_type
-        current_index += count
-    raise ValueError(f"Index {index} is out of range")
+        Raises
+        ------
+        ValueError
+            If the index is out of range.
+        """
+        current_index = 1
+        for element, count in atom_type_num.items():
+            if current_index <= index < current_index + count:
+                return element
+            current_index += count
+        raise ValueError(f"Index {index} is out of range")
 
     def parse_data(self, outcar_data, raw_basis):
         """
         Parse OUTCAR data
+
+        Parameters
+        ----------
+        outcar_data : list
+            A list of dictionaries containing OUTCAR data.
+            Example: 
+            [
+                {
+                    "file_name": "OUTCAR_00",
+                    "ionic_step": 1,
+                    "n_atom": 144,
+                    "n_atom_type": 2,
+                    "atom_type_num": {"Ce": 48, "O": 96},
+                    "sys_name": "CeO2",
+                    "mass": [140.115, 16.0],
+                    "stress": [0.1, 0.2, 0.3, 0.4, 0.5, 0.6],
+                    "vectors": [[10.0, 0.0, 0.0], [0.0, 10.0, 0.0], [0.0, 0.0, 10.0]],
+                    "positions": [[0.0, 0.0, 0.0], [1.0, 1.0, 1.0], ...],
+                    "forces": [[0.1, 0.2, 0.3], [-0.1, -0.2, -0.3], ...],
+                    "energy": -1234.5678,
+                },
+                ...
+            ]
+            "stress" contains elements in the order XX, YY, ZZ, XY, YZ, ZX.
+
+        raw_basis : list
+            A list of atom indices for the basis set of training data.
+            Example: [1, 3, 5]
+
+        Returns
+        -------
+        header_data : dict
+            A dictionary containing header data.
+            Example:
+            {
+                "max_n_atom_type": 2,
+                "all_atom_type": ["Ce", "O"],
+                "max_n_atom_per_sys": 144,
+                "max_n_atom_per_type": 96,
+                "ref_energy": [0.0, 0.0],
+                "mass": [140.115, 16.0],
+                "n_basis": []
+            }
+
+        training_data : list
+            A list of dictionaries containing training data.
+            Example:
+            [
+                {
+                    "conf_num": 1,
+                    "sys_name": "CeO2",
+                    "n_atom_type": 2,
+                    "n_atom": 144,
+                    "atom_type_num": {"Ce": 48, "O": 96},
+                    "ctifor": 0.002,
+                    "vectors": [[10.0, 0.0, 0.0], [0.0, 10.0, 0.0], [0.0, 0.0, 10.0]],
+                    "positions": [[0.0, 0.0, 0.0], [1.0, 1.0, 1.0], ...],
+                    "energy": -1234.5678,
+                    "forces": [[0.1, 0.2, 0.3], [-0.1, -0.2, -0.3], ...],
+                    "stress": [0.1, 0.2, 0.3, 0.4, 0.5, 0.6]
+                },
+                ...
+            ]
+
         """
 
         header_data = {}
         training_data = []
 
-        count = 1
+        conf_num = 1
         max_n_atom_type = 0
         all_atom_type = []
         max_n_atom_per_sys = 0
         max_n_atom_per_type = 0
         ref_energy = []
         mass = []
-        n_basis = []
+        n_basis = {}
+        all_basis = {}
         for step_results in outcar_data:
             # Extract header data
             if step_results["n_atom_type"] > max_n_atom_type:
                 max_n_atom_type = step_results["n_atom_type"]
 
-            for index, (atom_type, n_atom_per_type) in enumerate(step_results["atom_type_num"].items()):
-                if atom_type not in all_atom_type:
-                    all_atom_type.append(atom_type)
+            # Add n_basis related process
+            basis = {} # {element: [indices]}
+            if raw_basis:
+                for i in raw_basis:
+                    element = self.find_atom_by_index(step_results["atom_type_num"], i)
+                    if element in basis:
+                        basis[element].append(i)
+                    else:
+                        basis[element] = [i]
+                print(f"basis: {basis}")
+
+            for index, (element, n_atom_per_type) in enumerate(step_results["atom_type_num"].items()):
+                if element not in all_atom_type:
+                    all_atom_type.append(element)
 
                     ref_energy.append(0.0)
 
@@ -156,23 +263,25 @@ def find_atom_by_index(atom_type_num, index):
                 if step_results["mass"][index] not in mass:
                     mass.append(step_results["mass"][index])
 
-            # Add n_basis related process
-            basis = {} # {atom_type: [indices]}
-            if raw_basis:
-                for i in raw_basis:
-                    atom_type = find_atom_by_index(step_results["atom_type_num"], i)
-                    if atom_type in basis:
-                        basis[atom_type].append(i)
-                    else:
-                        basis[atom_type] = [i]
+                # Count basis data
+                if element in n_basis:
+                    n_basis[element] += len(basis[element])
+                else:
+                    n_basis[element] = len(basis[element])
 
-            ### Obtain n_basis, basis_for_X data ###
+                # Get basis data
+                basis_tag = f"basis_for_{element}"
+                if basis_tag not in all_basis:
+                    all_basis[basis_tag] = {}
+
+                if len(basis[element]) > 0:
+                    all_basis[basis_tag][conf_num] = basis[element]
 
             if step_results["n_atom"] > max_n_atom_per_sys:
                 max_n_atom_per_sys = step_results["n_atom"]
 
             # Extract training data
-            data = {"conf_num": count}
+            data = {"conf_num": conf_num}
             data["sys_name"] = step_results["sys_name"]
             data["n_atom_type"] = step_results["n_atom_type"]
             data["n_atom"] = step_results["n_atom"]
@@ -186,8 +295,9 @@ def find_atom_by_index(atom_type_num, index):
 
             training_data.append(data)
 
-            count += 1
+            conf_num += 1
 
+        # Set header data
         header_data["max_n_atom_type"] = max_n_atom_type
         header_data["all_atom_type"] = all_atom_type
         header_data["max_n_atom_per_sys"] = max_n_atom_per_sys
@@ -195,6 +305,9 @@ def find_atom_by_index(atom_type_num, index):
         header_data["ref_energy"] = ref_energy
         header_data["mass"] = mass
         header_data["n_basis"] = n_basis
+
+        for basis_tag in all_basis.keys():
+            header_data[basis_tag] = all_basis[basis_tag]
 
         return header_data, training_data
 
