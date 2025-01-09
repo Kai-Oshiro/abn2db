@@ -97,7 +97,8 @@ class Abn:
                     "energy": -123.456,
                     "forces": [[0.1, 0.2, 0.3], [-0.1, -0.2, -0.3], ...],
                     "stress": [0.1, 0.2, 0.3, 0.4, 0.5, 0.6]
-                }
+                },
+                ...
             ]
             "stress" contains elements in the order XX, YY, ZZ, XY, YZ, ZX.
         """
@@ -196,21 +197,21 @@ class Abn:
                 for j in range(i+2, end_idx):
                     basis_list.extend([int(x) for x in lines[j].strip().split()])
                 n_basis = {}
-                for atom_type, n in zip(header_data["all_atom_type"], basis_list):
-                    n_basis[atom_type] = n
+                for element, n in zip(header_data["all_atom_type"], basis_list):
+                    n_basis[element] = n
                 header_data["n_basis"] = n_basis
 
             # Basis set for each atom type (multiple lines)
             elif self.basis_flag in line:
                 end_idx = self._get_section_end_idx(lines, i, self.star_line)
                 basis = {}
-                atom_type = lines[i].split()[-1]
+                element = lines[i].split()[-1]
                 for j in range(i+2, end_idx):
                     config_idx, atom_idx = map(int, lines[j].split())
                     if config_idx not in basis:
                         basis[config_idx] = []
                     basis[config_idx].append(atom_idx)
-                header_data[f"basis_for_{atom_type}"] = basis
+                header_data[f"basis_for_{element}"] = basis
 
             # Stop loading the header data 
             elif self.conf_flag in line:
@@ -487,7 +488,8 @@ class Abn:
                     "energy": -123.456,
                     "forces": [[0.1, 0.2, 0.3], [-0.1, -0.2, -0.3], ...],
                     "stress": [0.1, 0.2, 0.3, 0.4, 0.5, 0.6]
-                }
+                },
+                ...
             ]
             "stress" contains elements in the order XX, YY, ZZ, XY, YZ, ZX.
         """
@@ -515,10 +517,10 @@ class Abn:
         lines.append(self.dash_line)
 
         grouped_all_atom_type = self._group_value(header_data["all_atom_type"])
-        for atom_type_list in grouped_all_atom_type:
+        for element_list in grouped_all_atom_type:
             content_line = f"{space}"
-            for atom_type in atom_type_list:
-                content_line += f"{atom_type:<2} "
+            for element in element_list:
+                content_line += f"{element:<2} "
             #content_line = content_line.rstrip() # Remove the trailing space
             if content_line.endswith(" "):
                 content_line = content_line[:-1] # Remove only one trailing space
@@ -581,13 +583,13 @@ class Abn:
             lines.append(content_line)
 
         # Basis set for each atom type
-        for atom_type in header_data["all_atom_type"]:
+        for element in header_data["all_atom_type"]:
             # Basis set for each atom type
             lines.append(self.star_line)
-            lines.append(f"{space}{self.basis_flag} {atom_type:<2}")
+            lines.append(f"{space}{self.basis_flag} {element:<2}")
             lines.append(self.dash_line)
 
-            basis = header_data[f"basis_for_{atom_type}"]
+            basis = header_data[f"basis_for_{element}"]
 
             if not bool(basis): # Check if the basis (dictionary) is empty
                 basis = {1: [1]} # Set the dummy key-value pair
