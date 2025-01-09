@@ -51,7 +51,7 @@ def main():
         outcar_files.append(os.path.abspath(outcar_file))
 
     if args.ionic_step:
-        is_indices = get_indecies(args.ionic_step)
+        is_indices = get_indices(args.ionic_step)
 
     oc = Outcar()
 
