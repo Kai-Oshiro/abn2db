@@ -14,6 +14,16 @@ def parse_slice(slice_str):
     step = int(parts[2]) if len(parts) > 2 and parts[2] else None
     return slice(start, end, step)
 
+def get_indices(raw_indices):
+    """Parse raw indices to a list of integers."""
+    indices = []
+    for index in raw_indices:
+        if ":" in index:
+            indices.extend(parse_slice(index))
+        else:
+            indices.append(int(index.strip()))
+    return indices
+
 def main():
     parser = argparse.ArgumentParser()
     # Positional arguments
@@ -40,14 +50,8 @@ def main():
     for outcar_file in args.outcar_files:
         outcar_files.append(os.path.abspath(outcar_file))
 
-    indices = None
     if args.ionic_step:
-        indices = []
-        for ionic_step in args.ionic_step:
-            if ":" in ionic_step:
-                indices.append(parse_slice(ionic_step))
-            else:
-                indices.append(int(ionic_step.strip()))
+        is_indices = get_indecies(args.ionic_step)
 
     oc = Outcar()
 
@@ -55,9 +59,9 @@ def main():
     for outcar_path in outcar_files:
         outcar_data = oc.read_outcar(outcar_path)
 
-        if indices:
+        if is_indices:
             results = []
-            for index in indices:
+            for index in is_indices:
                 if isinstance(index, slice):
                     results.extend(outcar_data[index])
                 else:
@@ -67,14 +71,22 @@ def main():
 
         all_outcar_data.extend(results)
 
-    #last_ionic_step = outcar_data[-1]
-    #for key, value in last_ionic_step.items():
-        #print(f"{key}: {value}")
+    print()
+    last_ionic_step = outcar_data[-1]
+    for key, value in last_ionic_step.items():
+        if key in ["positions", "forces"]:
+            print(f"{key}: {value[0]}")
+        else:
+            print(f"{key}: {value}")
 
     for data in all_outcar_data:
         print(f"\nionic_step: {data['ionic_step']}")
 
-    raw_basis = args.basis # list of atom indices
+    if args.basis:
+        raw_basis = get_indices(args.basis) # list of atom indices
+    else:
+        raw_basis = None
+
     header_data, training_data = oc.parse_data(all_outcar_data, raw_basis)
 
     print("\nHeader data:")
