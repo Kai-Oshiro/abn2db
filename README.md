@@ -17,7 +17,7 @@ This script merges multiple ML_ABN files into a single file. It converts the inp
 
 **Usage:**
 ```sh
-python merge_abn.py <abn_files> [-fn <file_name>] [-sdb]
+python merge_abn.py <abn_files> [-fn <file_name>] [-sd]
 ```
 
 **Arguments:**
