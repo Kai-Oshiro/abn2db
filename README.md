@@ -1,7 +1,7 @@
 # abn2db
 ## Overview
 
-`abn2db` library is a collection of Python scripts designed to handle the conversion, merging, and shuffling of training data in ML_ABN files. These scripts facilitate the manipulation of data files used in machine learning workflows.
+`abn2db` library is a collection of Python scripts designed to handle the conversion, merging, and shuffling of training data in ML_ABN files. These scripts facilitate the manipulation of data files used in VASP on-the-fly workflows.
 
 > Please note that this code may be verbose and not optimized, which could result in longer processing times for merging large ML_ABN files. 
 > 
