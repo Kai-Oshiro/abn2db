@@ -61,7 +61,7 @@ class Outcar:
         for idx, line in enumerate(lines):
             if self.atom_type_tag in line:
                 match = re.search(r"=(.*?):", line)
-                element_list.append(match.group(1))
+                element_list.append(match.group(1).strip())
 
             if self.n_atom_tag in line:
                 n_atom = int(line.split()[-1])
@@ -250,6 +250,9 @@ class Outcar:
                     else:
                         basis[element] = [i]
                 print(f"basis: {basis}")
+            else:
+                for element in step_results["atom_type_num"].keys():
+                    basis[element] = []
 
             for index, (element, n_atom_per_type) in enumerate(step_results["atom_type_num"].items()):
                 if element not in all_atom_type:
