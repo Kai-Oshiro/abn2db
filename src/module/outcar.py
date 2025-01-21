@@ -252,7 +252,6 @@ class Outcar:
                         basis[element].append(i)
                     else:
                         basis[element] = [i]
-                print(f"basis: {basis}")
             else:
                 for element in step_results["atom_type_num"].keys():
                     basis[element] = []
