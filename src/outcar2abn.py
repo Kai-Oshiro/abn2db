@@ -28,7 +28,7 @@ def main():
     parser = argparse.ArgumentParser()
     # Positional arguments
     parser.add_argument("outcar_files", type=str, nargs="+",
-                        help="Path of OUTCAR file to be loaded")
+                        help="Path of OUTCAR files to be loaded")
 
     # Optional arguments
     parser.add_argument("-fn", "--file_name", type=str, default=None,
@@ -50,6 +50,7 @@ def main():
     for outcar_file in args.outcar_files:
         outcar_files.append(os.path.abspath(outcar_file))
 
+    is_indices = None
     if args.ionic_step:
         is_indices = get_indices(args.ionic_step)
 
