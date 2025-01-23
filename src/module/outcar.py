@@ -50,29 +50,34 @@ class Outcar:
                     "vectors": [[10.0, 0.0, 0.0], [0.0, 10.0, 0.0], [0.0, 0.0, 10.0]],
                     "positions": [[0.0, 0.0, 0.0], [1.0, 1.0, 1.0], ...],
                     "forces": [[0.1, 0.2, 0.3], [-0.1, -0.2, -0.3], ...],
+                    "free_energy": -1234.5678,
                     "energy": -1234.5678,
+                    "is_dft": True,
                 },
                 ...
             ]
             "stress" contains elements in the order XX, YY, ZZ, XY, YZ, ZX.
         """
 
-        file_name = os.path.basename(outcar_path)
-
         with open(outcar_path, 'r') as f:
             lines = f.readlines()
 
-        ### Get common parameters ###
+
+        # Initialize common parameters
+        file_name = os.path.basename(outcar_path)
+        common_data = {"file_name": file_name}
         element_list = []
         mass = []
-        for idx, line in enumerate(lines):
+
+        ### Get common parameters ###
+        for line in lines:
             if self.atom_type_tag in line:
                 match = re.search(r"=(.*?):", line)
-                element_list.append(match.group(1).strip())
+                if match:
+                    element_list.append(match.group(1).strip())
 
             if self.mass_tag in line:
-                mass_line = lines[idx].split(";")[0]
-                mass_line = mass_line.replace("POMASS =", "").strip()
+                mass_line = line.split(";")[0].replace("POMASS =", "").strip()
                 mass.append(float(mass_line))
 
             if self.n_atom_tag in line:
@@ -80,49 +85,48 @@ class Outcar:
 
             if self.n_atom_per_type_tag in line:
                 n_atom_per_type = list(map(int, line.split("=")[1].split()))
-
+                # Check if the length of element_list (POTCAR-derived?) and n_atom_per_type (POSCAR-derived?) match
                 if len(element_list) != len(n_atom_per_type):
-                    raise ValueError("Number of atom types and number of atoms per type do not match.")
-
+                    raise ValueError("Mismatch between element list and atom per type list.")
                 n_atom_type = len(element_list)
                 atom_type_num = dict(zip(element_list, n_atom_per_type))
 
             if self.system_tag in line:
                 sys_name = line.replace(self.system_tag, "").strip()
-
-                break
+                break # Exit the loop once all common parameters are found
 
         # Add common parameters to the dictionary
-        common_data = {"file_name": file_name}
         common_data["mass"] = mass
         common_data["n_atom"] = n_atom
         common_data["n_atom_type"] = n_atom_type
         common_data["atom_type_num"] = atom_type_num
         common_data["sys_name"] = sys_name
 
-        ### Get iteration results ###
+        # Initialize ionic step data
         outcar_data = []
         is_dft = False
         is_step = False
+
+        ### Get results from ionic step ###
         for idx, line in enumerate(lines):
+            # Skip extra “direct lattice vectors” 
+            # keyword at the beginning of OUTCAR.
             if self.ionic_step_tag in line:
                 ionic_step = int(line.split()[-2])
-
                 is_step = True
-
-            # Skip the header section of OUTCAR
+            # Skip header section until the first ionic step
             if not is_step:
                 continue
 
+            # Judge if the current section is DFT or MLFF
             if self.dft_section_flag in line:
                 is_dft = True
-
             if self.mlff_section_flag in line:
                 is_dft = False
 
-            # Get DFT and MLFF results
+            # Get computational results
             if self.stress_tag in line:
-                stress = [float(x) for x in lines[idx].split()[2:8]]
+                stress = [float(x) for x in line.split()[2:8]]
 
             if self.vectors_tag in line:
                 vectors = []
