@@ -34,7 +34,7 @@ def main():
                         help="Seed for the random number generator")
 
     parser.add_argument("-sd", "--store_db", action="store_true",
-                        help="Save intermediate db files")
+                        help="Store intermediate db files")
 
     args = parser.parse_args()
 
