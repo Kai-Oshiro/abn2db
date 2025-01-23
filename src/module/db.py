@@ -37,7 +37,7 @@ class Database:
                     "ctifor": 2.000000000000000E-003,
                     "vectors": [[10.0, 0.0, 0.0], [0.0, 10.0, 0.0], [0.0, 0.0, 10.0]],
                     "positions": [[0.0, 0.0, 0.0], [1.0, 1.0, 1.0], ...],
-                    "energy": -123.456,
+                    "free_energy": -123.456,
                     "forces": [[0.1, 0.2, 0.3], [-0.1, -0.2, -0.3], ...],
                     "stress": [0.1, 0.2, 0.3, 0.4, 0.5, 0.6]
                 },
@@ -90,7 +90,7 @@ class Database:
                 pbc=True
                 )
 
-            free_energy = data["energy"]
+            free_energy = data["free_energy"]
             forces = data["forces"]
             stress = data["stress"]
 
@@ -176,7 +176,7 @@ class Database:
                     "ctifor": 0.002,
                     "vectors": [[10.0, 0.0, 0.0], [0.0, 10.0, 0.0], [0.0, 0.0, 10.0]],
                     "positions": [[0.0, 0.0, 0.0], [1.0, 1.0, 1.0], ...],
-                    "energy": -123.456,
+                    "free_energy": -123.456,
                     "forces": [[0.1, 0.2, 0.3], [-0.1, -0.2, -0.3], ...],
                     "stress": [0.1, 0.2, 0.3, 0.4, 0.5, 0.6]
                 },
@@ -237,7 +237,7 @@ class Database:
             # so it is registered as "free energy" in the atoms object.
             # On the other hand, variables and keys conform to the ML_ABN file 
             # and are represented as "energy".
-            energy = row.free_energy
+            free_energy = row.free_energy
             forces = row.forces.tolist()
             stress = row.stress.tolist()
 
@@ -248,7 +248,7 @@ class Database:
                 "ctifor": ctifor,
                 "vectors": vectors,
                 "positions": positions,
-                "energy": energy,
+                "free_energy": free_energy,
                 "forces": forces,
                 "stress": stress
                 })

@@ -94,7 +94,7 @@ class Abn:
                     "ctifor": 2.000000000000000E-003,
                     "vectors": [[10.0, 0.0, 0.0], [0.0, 10.0, 0.0], [0.0, 0.0, 10.0]],
                     "positions": [[0.0, 0.0, 0.0], [1.0, 1.0, 1.0], ...],
-                    "energy": -123.456,
+                    "free_energy": -123.456,
                     "forces": [[0.1, 0.2, 0.3], [-0.1, -0.2, -0.3], ...],
                     "stress": [0.1, 0.2, 0.3, 0.4, 0.5, 0.6]
                 },
@@ -319,7 +319,7 @@ class Abn:
 
             # Total energy (eV)
             elif self.energy_flag in line:
-                result_dict["energy"] = float(lines[i+2].strip())
+                result_dict["free_energy"] = float(lines[i+2].strip())
 
             # Forces (eV ang.^-1) (n_atom * 3 matrix)
             elif self.force_flag in line:
@@ -483,7 +483,7 @@ class Abn:
                     "ctifor": 0.002,
                     "vectors": [[10.0, 0.0, 0.0], [0.0, 10.0, 0.0], [0.0, 0.0, 10.0]],
                     "positions": [[0.0, 0.0, 0.0], [1.0, 1.0, 1.0], ...],
-                    "energy": -123.456,
+                    "free_energy": -123.456,
                     "forces": [[0.1, 0.2, 0.3], [-0.1, -0.2, -0.3], ...],
                     "stress": [0.1, 0.2, 0.3, 0.4, 0.5, 0.6]
                 },
@@ -670,7 +670,7 @@ class Abn:
             lines.append(self.eq_line)
             lines.append(f"{space}{self.energy_flag}")
             lines.append(self.dash_line)
-            value = data["energy"]
+            value = data["free_energy"]
             content_line = self._get_exp_notation(value)
             lines.append(f"{content_line}")
     

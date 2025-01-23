@@ -218,7 +218,7 @@ class Outcar:
                     "vectors": [[10.0, 0.0, 0.0], [0.0, 10.0, 0.0], [0.0, 0.0, 10.0]],
                     "positions": [[0.0, 0.0, 0.0], [1.0, 1.0, 1.0], ...],
                     "forces": [[0.1, 0.2, 0.3], [-0.1, -0.2, -0.3], ...],
-                    "energy": -1234.5678,
+                    "free_energy": -1234.5678,
                 },
                 ...
             ]
@@ -259,7 +259,7 @@ class Outcar:
                     "ctifor": 0.002,
                     "vectors": [[10.0, 0.0, 0.0], [0.0, 10.0, 0.0], [0.0, 0.0, 10.0]],
                     "positions": [[0.0, 0.0, 0.0], [1.0, 1.0, 1.0], ...],
-                    "energy": -1234.5678,
+                    "free_energy": -1234.5678,
                     "forces": [[0.1, 0.2, 0.3], [-0.1, -0.2, -0.3], ...],
                     "stress": [0.1, 0.2, 0.3, 0.4, 0.5, 0.6]
                 },
@@ -336,7 +336,7 @@ class Outcar:
             data["ctifor"] = 0.002
             data["vectors"] = step_results["vectors"]
             data["positions"] = step_results["positions"]
-            data["energy"] = step_results["energy"]
+            data["free_energy"] = step_results["free_energy"]
             data["forces"] = step_results["forces"]
             data["stress"] = step_results["stress"]
 
