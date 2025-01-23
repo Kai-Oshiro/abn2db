@@ -6,16 +6,16 @@ import argparse
 from module.outcar2 import Outcar2
 
 def main():
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description="Obtain data from OUTCAR files and write to a database file.")
     # Positional arguments
     parser.add_argument("outcar_files", type=str, nargs="+",
-                        help="Path of OUTCAR files to be loaded")
+                        help="Path to OUTCAR files to be loaded")
 
     # Optional arguments
-    parser.add_argument("-f", "--file_name", type=str, default=None,
+    parser.add_argument("-fn", "--file_name", type=str, default=None,
                         help="Name of new ML_ABN file.")
 
-    parser.add_argument("-d", "--data_type", type=str, default="dft",
+    parser.add_argument("-dt", "--data_type", type=str, default="dft",
                         help="Type of data to extract (e.g., 'dft', 'mlff', 'both').")
 
     # Parse the arguments
