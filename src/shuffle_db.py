@@ -35,7 +35,7 @@ def main():
                         help='The new ASE database file with shuffled rows.')
 
     parser.add_argument('-if', '--index_file', type=str, default=None,
-                        help='The file to save original and shuffled indices.')
+                        help='Specify a file to save the original and shuffled indexes.')
 
     parser.add_argument('-s', '--seed', type=int, default=1,
                         help='The seed for the random number generator.')
