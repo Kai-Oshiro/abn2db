@@ -25,7 +25,7 @@ class Outcar:
 
     def load(self, outcar_path):
         """
-        Read OUTCAR file
+        Extract computational results from OUTCAR file.
 
         Parameters
         ----------
@@ -168,6 +168,40 @@ class Outcar:
 
 
 
+    def filter_data(self, outcar_data, data_type):
+        """
+        Filter OUTCAR data based on the specified data type (DFT, MLFF, or both).
+
+        Parameters
+        ----------
+        outcar_data : list
+            A list of dictionaries containing OUTCAR data.
+        data_type : str
+            Type of data to extract (e.g., 'dft', 'mlff', 'both').
+
+        Returns
+        -------
+        filtered_outcar_data : list
+            A list of dictionaries containing filtered OUTCAR data.
+        """
+
+        data_type = data_type.lower()
+        if data_type.startswith("b"):
+            return outcar_data
+
+        filtered_outcar_data = []
+        is_dft_required = False
+        if data_type.startswith("d"):
+            is_dft_required = True
+
+        for data in outcar_data:
+            if data["is_dft"] == is_dft_required:
+                filtered_outcar_data.append(data)
+
+        return filtered_outcar_data
+
+
+
     def _find_atom_by_index(self, atom_type_num, index):
         """
         Given an index, determine which atom it corresponds to.
@@ -198,7 +232,7 @@ class Outcar:
 
     def parse_data(self, outcar_data, raw_basis):
         """
-        Parse OUTCAR data
+        Extract header and training data from OUTCAR data.
 
         Parameters
         ----------
