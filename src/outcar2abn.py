@@ -43,6 +43,9 @@ def main():
     parser.add_argument("-b", "--basis", type=str, nargs="+", default=None,
                         help="Atom indices for basis set of training data (e.g., '1:3' or '1 3 5').")
 
+    parser.add_argument("-m", "--method", type=str, default="both",
+                        help="Methods for calculating data to be extracted from OUTCAR. (e.g., 'dft', 'mlff', 'both').")
+
     # Parse the arguments
     args = parser.parse_args()
 
@@ -59,6 +62,7 @@ def main():
     all_outcar_data = []
     for outcar_path in outcar_files:
         outcar_data = oc.load(outcar_path)
+        outcar_data = oc.extract_data(outcar_data, args.method)
 
         if is_indices:
             results = []
@@ -77,6 +81,7 @@ def main():
     else:
         raw_basis = None
 
+    # Convert OUTCAR data into the format required for writing ML_ABN file
     header_data, training_data = oc.parse_data(all_outcar_data, raw_basis)
 
     # Define the path for the new database file
