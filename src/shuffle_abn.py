@@ -33,7 +33,7 @@ def main():
     parser.add_argument("-s", "--seed", type=int, default=1,
                         help="Seed for the random number generator")
 
-    parser.add_argument("-sd", "--save_db", action="store_true",
+    parser.add_argument("-sd", "--store_db", action="store_true",
                         help="Save intermediate db files")
 
     args = parser.parse_args()
@@ -53,7 +53,7 @@ def main():
     convert_db_to_abn(shuffled_db, shuffled_abn)
 
     # Delete intermediate db files
-    if not args.save_db:
+    if not args.store_db:
         os.remove(db_file)
         os.remove(shuffled_db)
 
