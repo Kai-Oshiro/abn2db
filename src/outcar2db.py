@@ -61,7 +61,7 @@ def main():
     all_outcar_data = []
     for outcar_path in outcar_files:
         outcar_data = oc.load(outcar_path)
-        outcar_data = oc.extract_data(outcar_data, args.method)
+        outcar_data = oc.filter_data(outcar_data, args.method)
 
         if is_indices:
             results = []
