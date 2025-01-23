@@ -28,7 +28,7 @@ def main():
     parser = argparse.ArgumentParser(description="Construct ML_ABN file from data in OUTCAR files.")
     # Positional arguments
     parser.add_argument("outcar_files", type=str, nargs="+",
-                        help="Path of OUTCAR files to be loaded.")
+                        help="Path to OUTCAR files to be loaded.")
 
     # Optional arguments
     parser.add_argument("-fn", "--file_name", type=str, default=None,

@@ -24,7 +24,7 @@ def main():
     parser = argparse.ArgumentParser(description="Merge ML_ABN files.")
     # Positional arguments
     parser.add_argument("abn_files", type=str, nargs="+",
-                        help="Path of ML_ABN files to merge.")
+                        help="Path to ML_ABN files to merge.")
 
     # Optional arguments
     parser.add_argument("-fn", "--file_name", type=str, default=None,

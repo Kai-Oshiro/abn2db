@@ -28,7 +28,7 @@ def main():
     parser = argparse.ArgumentParser(description="Shuffle rows in an ASE database file.")
     # Positional arguments
     parser.add_argument("db_file", type=str,
-                        help="Path of ASE database file.")
+                        help="Path to ASE database file.")
 
     # Optional arguments
     parser.add_argument("-fn", "--file_name", type=str, default=None,

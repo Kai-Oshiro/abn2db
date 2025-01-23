@@ -10,7 +10,7 @@ def main():
     parser = argparse.ArgumentParser(description="Convert ASE database file to ML_ABN file.")
     # Positional arguments
     parser.add_argument("db_file", type=str,
-                        help="Path of ASE database file to be loaded.")
+                        help="Path to ASE database file to be loaded.")
 
     # Optional arguments
     parser.add_argument("-fn", "--file_name", type=str, default=None,
