@@ -299,7 +299,6 @@ class Outcar:
                 },
                 ...
             ]
-
         """
 
         header_data = {}
@@ -393,3 +392,61 @@ class Outcar:
 
         return header_data, training_data
 
+
+
+    def write2db(self, outcar_data, db_path):
+        """
+        Write OUTCAR data directly to a ASE database file.
+
+        Parameters
+        ----------
+        outcar_data : list
+            A list of dictionaries containing OUTCAR data.
+        db_path : str
+            Path to the database file to be written.
+        """
+        db = connect(db_path)
+
+        for data in outcar_data:
+            chemical_symbols = []
+            for element, num in data["atom_type_num"].items():
+                chemical_symbols.extend([element] * num)
+
+            vectors = data["vectors"]
+            positions = data["positions"]
+
+            atoms = Atoms(
+                chemical_symbols, 
+                positions=positions, 
+                cell=vectors, 
+                pbc=True
+                )
+
+            free_energy = data["free_energy"]
+            energy = data["energy"]
+            forces = data["forces"]
+            stress = data["stress"]
+
+            calculator = SinglePointDFTCalculator(
+                atoms,
+                free_energy=free_energy,
+                energy=energy,
+                forces=forces,
+                stress=stress
+                )
+
+            atoms.set_calculator(calculator)
+            atoms.calc.name = "vasp"
+
+            sys_name = data["sys_name"]
+            ionic_step = data["ionic_step"]
+            file_name = data["file_name"]
+            is_dft = data["is_dft"]
+
+            db.write(
+                atoms,
+                sys_name=sys_name,
+                ionic_step=ionic_step,
+                file_name=file_name,
+                is_dft=is_dft
+                )
