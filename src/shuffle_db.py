@@ -25,20 +25,20 @@ def shuffle_db(input_file, output_file, index_file, seed=None):
             f.write(f"{shuffled + 1} => {original + 1}\n")
 
 def main():
-    parser = argparse.ArgumentParser(description='Shuffle rows in an ASE database file.')
+    parser = argparse.ArgumentParser(description="Shuffle rows in an ASE database file.")
     # Positional arguments
-    parser.add_argument('db_file', type=str,
-                        help='The input ASE database file.')
+    parser.add_argument("db_file", type=str,
+                        help="Path of ASE database file.")
 
     # Optional arguments
-    parser.add_argument('-fn', '--file_name', type=str, default=None,
-                        help='The new ASE database file with shuffled rows.')
+    parser.add_argument("-fn", "--file_name", type=str, default=None,
+                        help="Name of new shuffled ML_ABN file")
 
-    parser.add_argument('-if', '--index_file', type=str, default=None,
-                        help='Specify a file to save the original and shuffled indexes.')
+    parser.add_argument("-if", "--index_file", type=str, default=None,
+                        help="Specify a file to save original and shuffled indexes.")
 
-    parser.add_argument('-s', '--seed', type=int, default=1,
-                        help='The seed for the random number generator.')
+    parser.add_argument("-s", "--seed", type=int, default=1,
+                        help="Seed for the random number generator.")
 
     args = parser.parse_args()
 

@@ -24,7 +24,7 @@ def main():
     parser = argparse.ArgumentParser(description="Shuffle data in an ML_ABN file.")
     # Positional arguments
     parser.add_argument("abn_file", type=str,
-                        help="ML_ABN file to shuffle")
+                        help="Path of ML_ABN file to shuffle.")
 
     # Optional arguments
     parser.add_argument("-fn", "--file_name", type=str, default=None,

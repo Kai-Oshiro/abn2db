@@ -24,14 +24,14 @@ def main():
     parser = argparse.ArgumentParser(description="Merge ML_ABN files.")
     # Positional arguments
     parser.add_argument("abn_files", type=str, nargs="+",
-                        help="List of ML_ABN files to merge")
+                        help="Path of ML_ABN files to merge.")
 
     # Optional arguments
     parser.add_argument("-fn", "--file_name", type=str, default=None,
-                        help="Name of new ML_ABN file")
+                        help="Name of new ML_ABN file.")
 
-    parser.add_argument("-sd", "--save_db", action="store_true",
-                        help="Delete intermediate db files")
+    parser.add_argument("-sd", "--store_db", action="store_true",
+                        help="Store intermediate db files.")
 
     args = parser.parse_args()
 
@@ -50,7 +50,7 @@ def main():
     convert_db_to_abn(merged_db, merged_abn)
 
     # Delete intermediate db files
-    if not args.save_db:
+    if not args.store_db:
         for db_file in db_files:
             os.remove(db_file)
         os.remove(merged_db)

@@ -7,10 +7,10 @@ from module.abn import Abn
 from module.db import Database
 
 def main():
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description="Convert ML_ABN file to ASE database file.")
     # Positional arguments
     parser.add_argument("abn_file", type=str,
-                        help="Path of ML_ABN file to be loaded")
+                        help="Path of ML_ABN file to be loaded.")
 
     # Optional arguments
     parser.add_argument("-fn", "--file_name", type=str, default=None,

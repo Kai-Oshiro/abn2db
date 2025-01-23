@@ -5,10 +5,10 @@ import argparse
 from ase.db import connect
 
 def main():
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description="Merge ASE database files.")
     # Positional arguments
     parser.add_argument("db_files", type=str, nargs='+',
-                        help="Paths to the ML_ABN files to be loaded")
+                        help="Path of ASE database files to merge.")
 
     # Optional arguments
     parser.add_argument("-fn", "--file_name", type=str, default=None,
