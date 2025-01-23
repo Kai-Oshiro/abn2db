@@ -15,14 +15,14 @@ class Outcar:
         self.energy_tag = "free  energy   TOTEN  ="
         self.stress_tag = "in kB"
 
-    def read_outcar(self, outcar_path):
+    def load(self, outcar_path):
         """
         Read OUTCAR file
 
         Parameters
         ----------
         outcar_path : str
-            The path to the OUTCAR file.
+            Path to OUTCAR file to be loaded.
 
         Returns
         -------
@@ -126,7 +126,7 @@ class Outcar:
 
 
 
-    def find_atom_by_index(self, atom_type_num, index):
+    def _find_atom_by_index(self, atom_type_num, index):
         """
         Given an index, determine which atom it corresponds to.
 
@@ -247,7 +247,7 @@ class Outcar:
             basis = {} # {element: [indices]}
             if raw_basis:
                 for i in raw_basis:
-                    element = self.find_atom_by_index(step_results["atom_type_num"], i)
+                    element = self._find_atom_by_index(step_results["atom_type_num"], i)
                     if element in basis:
                         basis[element].append(i)
                     else:

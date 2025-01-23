@@ -22,7 +22,7 @@ def main():
     abn_path = os.path.abspath(abn_path)
 
     abn = Abn()
-    header_data, training_data = abn.read_abn(abn_path)
+    header_data, training_data = abn.load(abn_path)
 
     # Define the path for the new database file
     db_name = args.file_name
@@ -40,7 +40,7 @@ def main():
         raise FileExistsError(f"{db_path} already exists.")
 
     db = Database()
-    db.write_db(header_data, training_data, db_path)
+    db.store(header_data, training_data, db_path)
 
 if __name__ == "__main__":
     main()

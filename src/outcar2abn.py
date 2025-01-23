@@ -58,7 +58,7 @@ def main():
 
     all_outcar_data = []
     for outcar_path in outcar_files:
-        outcar_data = oc.read_outcar(outcar_path)
+        outcar_data = oc.load(outcar_path)
 
         if is_indices:
             results = []
@@ -94,7 +94,7 @@ def main():
 
     # Write ML_ABN file
     abn = Abn()
-    abn.write_abn(header_data, training_data, abn_path)
+    abn.store(header_data, training_data, abn_path)
 
 if __name__ == "__main__":
     main()

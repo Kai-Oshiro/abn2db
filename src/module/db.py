@@ -10,7 +10,7 @@ class Database:
     def __init__(self):
         self.cwd = os.getcwd()
 
-    def write_db(self, header_data, training_data, db_path):
+    def store(self, header_data, training_data, db_path):
         """
         Write the header data and training data to the database file.
         
@@ -46,7 +46,7 @@ class Database:
             "stress" contains elements in the order XX, YY, ZZ, XY, YZ, ZX.
 
         db_path : str
-            Path of the database file to be created.
+            Path to ASE database file to be written.
 
         Notes
         -----
@@ -132,14 +132,14 @@ class Database:
 
 
 
-    def read_db(self, db_path, ref_energy=None, mass=None):
+    def load(self, db_path, ref_energy=None, mass=None):
         """
         Read the header data and training data from the database file.
 
         Parameters
         ----------
         db_path : str
-            Path of the database file to be read.
+            Path to ASE database file to be loaded.
         ref_energy : list, optional
             Reference energy for each atom type.
             Default is None.
@@ -184,11 +184,10 @@ class Database:
             ]
             "stress" contains elements in the order XX, YY, ZZ, XY, YZ, ZX.
         """
-        self.db_path = db_path
         self.ref_energy = ref_energy
         self.mass = mass
 
-        db = connect(self.db_path)
+        db = connect(db_path)
 
         header_data = {}
         training_data = []

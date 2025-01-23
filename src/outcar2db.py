@@ -57,7 +57,7 @@ def main():
 
     all_outcar_data = []
     for outcar_path in outcar_files:
-        outcar_data = oc.read_outcar(outcar_path)
+        outcar_data = oc.load(outcar_path)
 
         if is_indices:
             results = []
@@ -95,7 +95,7 @@ def main():
 
     # Write the database
     db = Database()
-    db.write_db(header_data, training_data, db_path)
+    db.store(header_data, training_data, db_path)
 
 if __name__ == "__main__":
     main()

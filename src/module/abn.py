@@ -56,14 +56,14 @@ class Abn:
                 break
         return end_idx
 
-    def read_abn(self, abn_path):
+    def load(self, abn_path):
         """
-        Read the ABN file and extract relevant data.
+        Read the ML_ABN file and extract relevant data.
 
         Parameters
         ----------
         abn_path : str
-            Path to the ABN file to be read.
+            Path to ML_ABN file to be loaded.
 
         Returns
         -------
@@ -103,12 +103,10 @@ class Abn:
             "stress" contains elements in the order XX, YY, ZZ, XY, YZ, ZX.
         """
 
-        self.abn_path = abn_path
-
         header_data = {}
         training_data = []
 
-        with open(self.abn_path, 'r') as file:
+        with open(abn_path, 'r') as file:
             lines = file.readlines()
 
         # Store file format version from the first line
@@ -452,7 +450,7 @@ class Abn:
             _str_line = f" {value:>18.{float_digits}f}     "
         return _str_line
 
-    def write_abn(self, header_data, training_data, db_path):
+    def store(self, header_data, training_data, abn_path):
         """
         Write the header and training data to the ML_ABN file.
 
@@ -492,6 +490,10 @@ class Abn:
                 ...
             ]
             "stress" contains elements in the order XX, YY, ZZ, XY, YZ, ZX.
+
+        abn_path : str
+            Path to ML_ABN file to be written.
+
         """
         lines = []
         space = "     "
@@ -703,6 +705,6 @@ class Abn:
                 content_line += str_line
             lines.append(content_line)
 
-        with open(db_path, 'w') as file:
+        with open(abn_path, 'w') as file:
             for line in lines:
                 file.write(f"{line}\n")

@@ -22,7 +22,7 @@ def main():
     db_path = os.path.abspath(db_path)
 
     db = Database()
-    header_data, training_data = db.read_db(db_path)
+    header_data, training_data = db.load(db_path)
 
     # Define the path for the new ML_ABN file
     abn_name = args.file_name
@@ -37,7 +37,7 @@ def main():
         raise FileExistsError(f"{abn_path} already exists.")
 
     abn = Abn()
-    abn.write_abn(header_data, training_data, abn_path)
+    abn.store(header_data, training_data, abn_path)
 
 if __name__ == "__main__":
     main()
