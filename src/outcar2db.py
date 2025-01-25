@@ -53,6 +53,7 @@ def main():
     for outcar_file in args.outcar_files:
         outcar_files.append(os.path.abspath(outcar_file))
 
+    is_indices = None
     if args.ionic_step:
         is_indices = get_indices(args.ionic_step)
 
