@@ -1,6 +1,10 @@
 import os
 import re
 
+from ase import Atoms
+from ase.calculators.singlepoint import SinglePointDFTCalculator
+from ase.db import connect
+
 class Outcar:
     def __init__(self):
         # Keywords for common parameters
