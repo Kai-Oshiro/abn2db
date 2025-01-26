@@ -3,8 +3,10 @@ import os
 import argparse
 
 from ase import Atoms
+from ase.db import connect
 
 from module.vasp import VaspCalculator
+from module.support import delete_vasp_io
 
 def main():
     parser = argparse.ArgumentParser(description="Perform ab initio calculation on structures in ase db file.")
@@ -15,12 +17,10 @@ def main():
     # Optional arguments
     parser.add_argument("-fn", "--file_name", type=str, default="results.db",
                         help="Name of the database file that will contain calculation results")
+
     parser.add_argument("-c", "--command", type=str, default="mpirun -np",
                         help="Command to run VASP.")
-    parser.add_argument("-n", "--n_core", type=int, default=4,
-                        help="Number of cores to use.")
-    parser.add_argument("-vp", "--vasp_path", type=str, default="vasp_std",
-                        help="Path to VASP executable.")
+
     parser.add_argument("-wd", "--work_dir", type=str, default="./",
                         help="Path to working directory.")
 
@@ -40,11 +40,7 @@ def main():
     new_db_path = os.path.abspath(new_db_path)
     new_db = connect(new_db_path)
 
-    command = args.command
-    n_core = args.n_core
-    vasp_path = args.vasp_path
-
-    for row in db.select():
+    for row in ref_db.select():
         ref_atoms = row.toatoms()
         chemical_symbols = ref_atoms.get_chemical_symbols()
         cell = row.toatoms().get_cell()
@@ -53,19 +49,17 @@ def main():
         ionic_step = row.ionic_step
 
         atoms = Atoms(
-            symbols=chemical_symbols, 
-            cell=cell, 
+            symbols=chemical_symbols,
+            cell=cell,
             positions=positions,
             pbc=True
-            )
+        )
 
         calc = VaspCalculator(
-            command=command, 
-            cores=n_core, 
-            vasp_path=vasp_path, 
-            work_dir=work_dir
+            command=args.command,
+            work_dir=work_dir,
             make_poscar=True
-            )
+        )
 
         atoms.set_calculator(calc)
         atoms.calc.name = "vasp"
@@ -76,8 +70,13 @@ def main():
         new_db.write(atoms,
             sys_name=sys_name,
             ionic_step=ionic_step,
-            is_dft=result_dict["is_dft"],
-            )
+            is_dft=results_dict["is_dft"],
+            normal_termination=results_dict["normal_termination"],
+            opt_convergence=results_dict["opt_convergence"],
+            elapsed_time=results_dict["elapsed_time"]
+        )
+
+        delete_vasp_io(work_dir)
 
 if __name__ == "__main__":
     main()

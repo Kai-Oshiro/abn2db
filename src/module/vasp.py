@@ -10,12 +10,12 @@ from ase.calculators.calculator import Calculator, all_changes
 from . import outcar
 
 class VaspCalculator(Calculator):
-    def __init__(self, 
-        command="mpirun -np", 
-        n_core=4, 
-        vasp_path="vasp_std", 
-        work_dir="./", 
-        make_poscar=False
+    implemented_properties = ["energy", "free_energy", "forces", "stress"]
+
+    def __init__(self,
+        command="mpirun -np 4 vasp_std",
+        work_dir="./",
+        make_poscar=False,
         **kwargs
         ):
 
@@ -27,7 +27,7 @@ class VaspCalculator(Calculator):
         self.opt_convergence_flag = "reached required accuracy - stopping structural energy minimisation"
         self.elapsed_time_flag = "Elapsed time (sec):"
 
-        self.command = f"{command} {n_core} {vasp_path}"
+        self.command = command
         self.work_dir = os.path.abspath(work_dir)
         self.make_poscar = make_poscar
 
@@ -76,12 +76,15 @@ class VaspCalculator(Calculator):
 
         self.clear_results()
 
+        cwd = os.getcwd()
+        os.chdir(self.work_dir)
+
         # Write POSCAR file
         if self.make_poscar:
             write_vasp(self.poscar_path, self.atoms)
 
         # Execute VASP
-        subproc = subprocess.run(command, shell=True, capture_output=True, text=True)
+        subproc = subprocess.run(self.command, shell=True, capture_output=True, text=True)
 
         # Write the stdout to the file
         with open(self.out_path, "w") as f:
@@ -90,8 +93,8 @@ class VaspCalculator(Calculator):
         # Parse the OUTCAR file
         convergence_info = self.check_convergence()
 
-        oc = outcar.Outcar(self.outcar_path)
-        outcar_data = os.load()
+        oc = outcar.Outcar()
+        outcar_data = oc.load(self.outcar_path)
 
         self.results_dict = outcar_data[-1]
         self.results_dict["normal_termination"] = convergence_info["normal_termination"]
@@ -99,10 +102,12 @@ class VaspCalculator(Calculator):
         self.results_dict["elapsed_time"] = convergence_info["elapsed_time"]
 
         # Return the results to the ASE
-        self.results["energy"] = self.last_data.get("energy", None)
-        self.results["free_energy"] = self.last_data.get("free_energy", None)
-        self.results["forces"] = np.array(self.last_data.get("forces", []))
-        self.results["stress"] = np.array(self.last_data.get("stress", []))
+        self.results["energy"] = self.results_dict.get("energy", None)
+        self.results["free_energy"] = self.results_dict.get("free_energy", None)
+        self.results["forces"] = np.array(self.results_dict.get("forces", []))
+        self.results["stress"] = np.array(self.results_dict.get("stress", []))
+
+        os.chdir(cwd)
 
     def get_results(self):
         return self.results_dict
