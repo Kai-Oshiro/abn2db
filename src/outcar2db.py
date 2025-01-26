@@ -1,28 +1,10 @@
 #!/usr/bin/env python3
 import os
-import ase
 import argparse
 
 from module.outcar import Outcar
 from module.db import Database
-
-def parse_slice(slice_str):
-    """Parse a slice string like '1:3:2' or '-3:' into a slice object."""
-    parts = slice_str.split(':')
-    start = int(parts[0]) if parts[0] else None
-    end = int(parts[1]) if len(parts) > 1 and parts[1] else None
-    step = int(parts[2]) if len(parts) > 2 and parts[2] else None
-    return slice(start, end, step)
-
-def get_indices(raw_indices):
-    """Parse raw indices to a list of integers."""
-    indices = []
-    for index in raw_indices:
-        if ":" in index:
-            indices.extend(parse_slice(index))
-        else:
-            indices.append(int(index.strip()))
-    return indices
+from module.support import get_indices
 
 def main():
     parser = argparse.ArgumentParser(description="Construct ASE database file from data in OUTCAR files.")

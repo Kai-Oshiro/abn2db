@@ -1,28 +1,8 @@
 #!/usr/bin/env python3
 import os
-import random
 import argparse
-from ase.db import connect
 
-def shuffle_db(input_file, output_file, index_file, seed=None):
-    db = connect(input_file)
-    rows = list(db.select())
-    original_indices = list(range(len(rows)))
-
-    if seed is not None:
-        random.seed(seed)
-
-    shuffled_indices = original_indices[:]
-    random.shuffle(shuffled_indices)
-
-    new_db = connect(output_file, use_lock_file=False)
-    for i in shuffled_indices:
-        row = rows[i]
-        new_db.write(row.toatoms(), key_value_pairs=row.key_value_pairs, data=row.data)
-
-    with open(index_file, 'w') as f:
-        for original, shuffled in sorted(zip(original_indices, shuffled_indices), key=lambda x: x[1]):
-            f.write(f"{shuffled + 1} => {original + 1}\n")
+from module.support import shuffle_db
 
 def main():
     parser = argparse.ArgumentParser(description="Shuffle rows in an ASE database file.")

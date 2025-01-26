@@ -1,24 +1,8 @@
 #!/usr/bin/env python3
 import os
 import argparse
-import subprocess
 
-script_dir = os.path.dirname(os.path.realpath(__file__))
-abn2db = os.path.join(script_dir, "abn2db.py")
-db2abn = os.path.join(script_dir, "db2abn.py")
-shuffle_db = os.path.join(script_dir, "shuffle_db.py")
-
-def convert_abn_to_db(abn_file):
-    db_file = abn_file + ".db"
-    subprocess.run([abn2db, abn_file, "-fn", db_file])
-    return db_file
-
-def shuffle_db_file(db_file, shuffled_db, index_file, seed):
-    command = [shuffle_db, db_file, "-fn", shuffled_db, "-if", index_file, "-s", str(seed)]
-    subprocess.run(command)
-
-def convert_db_to_abn(db_file, new_abn):
-    subprocess.run([db2abn, db_file, "-fn", new_abn])
+from module.support import convert_abn_to_db, shuffle_db_file, convert_db_to_abn
 
 def main():
     parser = argparse.ArgumentParser(description="Shuffle data in an ML_ABN file.")
