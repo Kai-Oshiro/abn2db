@@ -68,7 +68,7 @@ class Database:
                 "basis": {"Ce": [1, 2, 3, ...], "O": [9, 10, 11, ...]},
                 "ref_energy": [0.0, 0.0],
                 "mass": [140.115, 16.0]
-                }
+            }
         }
         """
         self.header_data = header_data
@@ -88,7 +88,7 @@ class Database:
                 cell=vectors,
                 positions=positions,
                 pbc=True
-                )
+            )
 
             free_energy = data["free_energy"]
             forces = data["forces"]
@@ -99,7 +99,7 @@ class Database:
                 free_energy=free_energy,
                 forces=forces,
                 stress=stress
-                )
+            )
 
             atoms.set_calculator(calculator)
             atoms.calc.name = "vasp"
@@ -127,8 +127,8 @@ class Database:
                     "basis": basis,
                     "ref_energy": ref_energy,
                     "mass": mass
-                    }
-                )
+                }
+            )
 
 
 

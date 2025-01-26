@@ -424,7 +424,7 @@ class Outcar:
                 positions=positions, 
                 cell=vectors, 
                 pbc=True
-                )
+            )
 
             free_energy = data["free_energy"]
             energy = data["energy"]
@@ -437,7 +437,7 @@ class Outcar:
                 energy=energy,
                 forces=forces,
                 stress=stress
-                )
+            )
 
             atoms.set_calculator(calculator)
             atoms.calc.name = "vasp"
@@ -453,4 +453,4 @@ class Outcar:
                 ionic_step=ionic_step,
                 file_name=file_name,
                 is_dft=is_dft
-                )
+            )
