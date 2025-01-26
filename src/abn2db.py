@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import os
-import ase
 import argparse
 
 from module.abn import Abn
