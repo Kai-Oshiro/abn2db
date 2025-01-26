@@ -41,7 +41,7 @@ def get_indices(raw_indices):
     indices = []
     for index in raw_indices:
         if ":" in index:
-            indices.extend(parse_slice(index))
+            indices.append(parse_slice(index))
         else:
             indices.append(int(index.strip()))
     return indices
@@ -73,3 +73,17 @@ def shuffle_db(input_file, output_file, index_file, seed=None):
     with open(index_file, 'w') as f:
         for original, shuffled in sorted(zip(original_indices, shuffled_indices), key=lambda x: x[1]):
             f.write(f"{shuffled + 1} => {original + 1}\n")
+
+### for excute_vasp.py ###
+def delete_vasp_io(work_dir):
+    file_list = [
+        "CHG", "CHGCAR", "CONTCAR", "DOSCAR",
+        "EIGENVAL", "IBZKPT", "ML_LOGFILE", "OSZICAR",
+        "OUTCAR", "PCDAT", "POSCAR", "REPORT",
+        "vasprun.xml", "WAVECAR", "XDATCAR"
+    ]
+
+    for file in file_list:
+        file_path = os.path.join(work_dir, file)
+        if os.path.exists(file_path):
+            os.remove(file_path)
