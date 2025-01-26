@@ -331,8 +331,9 @@ class Outcar:
                         basis[element].append(i)
                     else:
                         basis[element] = [i]
-            else:
-                for element in step_results["atom_type_num"].keys():
+
+            for element in step_results["atom_type_num"].keys():
+                if element not in basis:
                     basis[element] = []
 
             for index, (element, n_atom_per_type) in enumerate(step_results["atom_type_num"].items()):

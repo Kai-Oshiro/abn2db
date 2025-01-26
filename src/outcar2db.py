@@ -59,7 +59,13 @@ def main():
         all_outcar_data.extend(results)
 
     if args.basis:
-        raw_basis = get_indices(args.basis) # list of atom indices
+        basis_indices = get_indices(args.basis) # list of atom indices or slices
+        raw_basis = []
+        for index in basis_indices:
+            if isinstance(index, slice):
+                raw_basis.extend(list(range(index.start, index.stop, index.step if index.step else 1)))
+            else:
+                raw_basis.append(index)
     else:
         raw_basis = None
 
