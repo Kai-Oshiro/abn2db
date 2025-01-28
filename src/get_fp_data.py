@@ -13,7 +13,7 @@ def main():
 
     # Optional arguments
     parser.add_argument("-fn", "--file_name", type=str, default=None,
-                        help="Name of new ML_ABN file.")
+                        help="Name of new ASE database file.")
 
     parser.add_argument("-is", "--ionic_step", type=str, nargs="+", default=None,
                         help="Ionic step you want to get (e.g., '1:3', '1 3 5' or '-1').\n\
