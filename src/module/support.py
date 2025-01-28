@@ -75,12 +75,22 @@ def shuffle_db(input_file, output_file, index_file, seed=None):
             f.write(f"{shuffled + 1} => {original + 1}\n")
 
 ### for excute_vasp.py ###
-def delete_vasp_io(work_dir):
+def save_io(work_dir, io_files, file_id):
+    for file in io_files:
+        io_dir = os.path.join(work_dir, "io_files")
+        file_path = os.path.join(io_dir, f"{file}_{file_id:04d}")
+        if not os.path.exists(io_dir):
+            os.makedirs(io_dir)
+        if os.path.exists(file_path):
+            raise FileExistsError(f"{file_path} already exists.")
+        os.rename(os.path.join(work_dir, file), file_path)
+
+def delete_io(work_dir):
     file_list = [
         "CHG", "CHGCAR", "CONTCAR", "DOSCAR",
         "EIGENVAL", "IBZKPT", "ML_LOGFILE", "OSZICAR",
         "OUTCAR", "PCDAT", "POSCAR", "REPORT",
-        "vasprun.xml", "WAVECAR", "XDATCAR"
+        "vasprun.xml", "WAVECAR", "XDATCAR", "vasp.out"
     ]
 
     for file in file_list:
