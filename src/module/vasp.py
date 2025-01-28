@@ -65,7 +65,7 @@ class VaspCalculator(Calculator):
 
     def calculate(self, 
         atoms=None, 
-        properties=("energy", "forces"),
+        properties=("energy", "free_energy", "forces", "stress"),
         system_changes=tuple(all_changes)
         ):
 
@@ -101,7 +101,7 @@ class VaspCalculator(Calculator):
         self.results_dict["opt_convergence"] = convergence_info["opt_convergence"]
         self.results_dict["elapsed_time"] = convergence_info["elapsed_time"]
 
-        # Return the results to the ASE
+        # Results for the ASE
         self.results["energy"] = self.results_dict.get("energy", None)
         self.results["free_energy"] = self.results_dict.get("free_energy", None)
         self.results["forces"] = np.array(self.results_dict.get("forces", []))
