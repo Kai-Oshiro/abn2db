@@ -15,9 +15,9 @@ def read_ase_db(file_path):
 
 def plot_energies(
         energies1, energies2, n_atoms1, natoms2, 
-        max_min_list=None, step=25, color="#1f77b4",
+        max_min_list=None, interval=25, color="#1f77b4",
         fontsize=18, labelsize=14, show=False, save=False,
-        fig_path="./energies_comparison.png"
+        fig_name="./energies_comparison.png"
     ):
 
     if max_min_list:
@@ -28,8 +28,8 @@ def plot_energies(
 
         max_value = max(max_1, max_2)
         min_value = min(min_1, min_2)
-        max_value = (np.ceil(max_value / step) * step)
-        min_value = (np.floor(min_value / step) * step)
+        max_value = (np.ceil(max_value / interval) * interval)
+        min_value = (np.floor(min_value / interval) * interval)
 
     rmse = np.sqrt(np.mean((energies1 - energies2) ** 2))
 
@@ -75,8 +75,8 @@ def plot_energies(
     ax.set_aspect("equal", adjustable="box")
     ax.set_xlim([min_value, max_value])
     ax.set_ylim([min_value, max_value])
-    ax.set_xticks(np.arange(min_value, max_value+1, step))
-    ax.set_yticks(np.arange(min_value, max_value+1, step))
+    ax.set_xticks(np.arange(min_value, max_value+1, interval))
+    ax.set_yticks(np.arange(min_value, max_value+1, interval))
     ax.tick_params(
         axis='both', which='major', 
         labelsize=labelsize, width=2
@@ -90,8 +90,8 @@ def plot_energies(
     fig.tight_layout()
 
     if save:
-        plt.savefig(fig_path, dpi=600)
-        print(f"Figure saved as {fig_path}")
+        plt.savefig(fig_name, dpi=600)
+        print(f"Figure saved as {fig_name}")
 
     if not show:
         plt.close()
@@ -100,8 +100,8 @@ def plot_energies(
 
 def plot_forces(
         forces1, forces2, natoms1, natoms2,
-        max_min_list=None, step=25, color_list=["#1f77b4", "#ff7f0e", "#2ca02c"],
-        fontsize=18, labelsize=14, show=False, save=False, fig_path="./forces_comparison.png"
+        max_min_list=None, interval=25, color_list=["#1f77b4", "#ff7f0e", "#2ca02c"],
+        fontsize=18, labelsize=14, show=False, save=False, fig_name="./forces_comparison.png"
     ):
 
     if max_min_list:
@@ -112,12 +112,11 @@ def plot_forces(
 
         max_value = max(max_1, max_2)
         min_value = min(min_1, min_2)
-        max_value = (np.ceil(max_value / step) * step)
-        min_value = (np.floor(min_value / step) * step)
+        max_value = (np.ceil(max_value / interval) * interval)
+        min_value = (np.floor(min_value / interval) * interval)
 
     rmse = np.sqrt(np.mean((forces1 - forces2) ** 2))
 
-    print("Calculating RMSE per atom...")
     natoms1_expanded = np.broadcast_to(natoms1[:, np.newaxis, np.newaxis], forces1.shape)
     natoms2_expanded = np.broadcast_to(natoms2[:, np.newaxis, np.newaxis], forces2.shape)
 
@@ -134,7 +133,6 @@ def plot_forces(
         "k--", linewidth=1.5, zorder=2
     )
 
-    print("Plotting the data...")
     # Plot the data
     directions = ["x", "y", "z"]
     forces1_flat = forces1.reshape(-1, 3)
@@ -145,19 +143,6 @@ def plot_forces(
             zorder=4, color=color_list[j], 
             alpha=0.5, label=directions[j]
         )
-
-    """
-        # Plot the data
-    directions = ["x", "y", "z"]
-    for structural_forces1, structural_forces2 in zip(forces1, forces2):
-        for atomic_forces1, atomic_forces2 in zip(structural_forces1, structural_forces2):
-            for j in range(3):
-                ax.scatter(
-                    atomic_forces1[j], atomic_forces2[j], 
-                    zorder=4, color=color_list[j], 
-                    alpha=0.5, label=directions[j]
-                )
-    """
 
     # Add title and labels
     ax.set_xlabel("DFT results (eV/Å)", fontsize=fontsize)
@@ -178,8 +163,8 @@ def plot_forces(
     ax.set_aspect("equal", adjustable="box")
     ax.set_xlim([min_value, max_value])
     ax.set_ylim([min_value, max_value])
-    ax.set_xticks(np.arange(min_value, max_value+1, step))
-    ax.set_yticks(np.arange(min_value, max_value+1, step))
+    ax.set_xticks(np.arange(min_value, max_value+1, interval))
+    ax.set_yticks(np.arange(min_value, max_value+1, interval))
     ax.tick_params(
         axis='both', which='major', 
         labelsize=labelsize, width=2
@@ -201,10 +186,9 @@ def plot_forces(
     # Save the figure
     fig.tight_layout()
 
-    print("Saving the figure...")
     if save:
-        plt.savefig(fig_path, dpi=600)
-        print(f"Figure saved as {fig_path}")
+        plt.savefig(fig_name, dpi=600)
+        print(f"Figure saved as {fig_name}")
 
     if not show:
         plt.close()
