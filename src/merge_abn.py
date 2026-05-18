@@ -2,7 +2,7 @@
 import os
 import argparse
 
-from module.support import convert_abn_to_db, merge_db_files, convert_db_to_abn
+from utils.support import convert_abn_to_db, merge_db_files, convert_db_to_abn
 
 def main():
     parser = argparse.ArgumentParser(description="Merge ML_ABN files.")

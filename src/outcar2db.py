@@ -2,9 +2,9 @@
 import os
 import argparse
 
-from module.outcar import Outcar
-from module.db import Database
-from module.support import get_indices
+from utils.outcar import Outcar
+from utils.db import Database
+from utils.support import get_indices
 
 def main():
     parser = argparse.ArgumentParser(description="Construct ASE database file from data in OUTCAR files.")

@@ -2,7 +2,7 @@
 import os
 import argparse
 
-from module.support import convert_abn_to_db, shuffle_db_file, convert_db_to_abn
+from utils.support import convert_abn_to_db, shuffle_db_file, convert_db_to_abn
 
 def main():
     parser = argparse.ArgumentParser(description="Shuffle data in an ML_ABN file.")

@@ -2,8 +2,8 @@
 import os
 import argparse
 
-from module.abn import Abn
-from module.db import Database
+from utils.abn import Abn
+from utils.db import Database
 
 def main():
     parser = argparse.ArgumentParser(description="Convert ML_ABN file to ASE database file.")

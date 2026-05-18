@@ -2,7 +2,7 @@
 import os
 import argparse
 
-from module.support import shuffle_db
+from utils.support import shuffle_db
 
 def main():
     parser = argparse.ArgumentParser(description="Shuffle rows in an ASE database file.")

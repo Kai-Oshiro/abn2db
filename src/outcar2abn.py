@@ -2,9 +2,9 @@
 import os
 import argparse
 
-from module.outcar import Outcar
-from module.abn import Abn
-from module.support import get_indices
+from utils.outcar import Outcar
+from utils.abn import Abn
+from utils.support import get_indices
 
 def main():
     parser = argparse.ArgumentParser(description="Construct ML_ABN file from data in OUTCAR files.")

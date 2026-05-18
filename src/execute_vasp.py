@@ -5,8 +5,8 @@ import argparse
 from ase import Atoms
 from ase.db import connect
 
-from module.vasp import VaspCalculator
-from module.support import save_io, delete_io
+from utils.vasp import VaspCalculator
+from utils.support import save_io, delete_io
 
 def main():
     parser = argparse.ArgumentParser(description="Perform VASP on structures in ase db file.")

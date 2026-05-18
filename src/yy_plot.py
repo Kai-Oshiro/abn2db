@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import argparse
 
-from module.plot_support import read_ase_db, plot_energies, plot_forces
+from utils.plot_support import read_ase_db, plot_energies, plot_forces
 
 def main():
     parser = argparse.ArgumentParser(description="Plot energies and forces from two ASE database files.")
