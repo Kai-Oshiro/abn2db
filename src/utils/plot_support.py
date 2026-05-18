@@ -15,7 +15,7 @@ def read_ase_db(file_path):
 
 def plot_energies(
         energies1, energies2, natoms1, natoms2, 
-        max_min_list=None, interval=25, color="#1f77b4",
+        max_min_list=None, interval=25, color="C0",
         fontsize=18, labelsize=14, show=False, save=False,
         fig_name="./energies_comparison.png"
     ):
@@ -100,7 +100,7 @@ def plot_energies(
 
 def plot_forces(
         forces1, forces2, natoms1, natoms2,
-        max_min_list=None, interval=25, color_list=["#1f77b4", "#ff7f0e", "#2ca02c"],
+        max_min_list=None, interval=25, color_list=["C0", "C1", "C2"],
         fontsize=18, labelsize=14, show=False, save=False, fig_name="./forces_comparison.png"
     ):
 
