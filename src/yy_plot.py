@@ -76,14 +76,14 @@ def main():
     elif plot_flag.startswith("b"):
         plot_energies(
             energies1, energies2, natoms1, natoms2,
-            [-150, -300], 50, "#1f77b4",
+            [-240, -270], 10, "#1f77b4",
             fontsize, labelsize, show, save,
             "energies_comparison.png"
         )
 
         plot_forces(
             forces1, forces2, natoms1, natoms2,
-            [450, -450], 150, ["#1f77b4", "#ff7f0e", "#2ca02c"],
+            [20, -20], 10, ["#1f77b4", "#ff7f0e", "#2ca02c"],
             fontsize, labelsize, show, save,
             "forces_comparison.png"
         )

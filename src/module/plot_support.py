@@ -14,7 +14,7 @@ def read_ase_db(file_path):
     return np.array(energies), np.array(forces), np.array(natoms)
 
 def plot_energies(
-        energies1, energies2, n_atoms1, natoms2, 
+        energies1, energies2, natoms1, natoms2, 
         max_min_list=None, interval=25, color="#1f77b4",
         fontsize=18, labelsize=14, show=False, save=False,
         fig_name="./energies_comparison.png"
@@ -33,7 +33,7 @@ def plot_energies(
 
     rmse = np.sqrt(np.mean((energies1 - energies2) ** 2))
 
-    energy_per_atom1 = energies1 / n_atoms1
+    energy_per_atom1 = energies1 / natoms1
     energy_per_atom2 = energies2 / natoms2
     rmse_per_atom = np.sqrt(np.mean((energy_per_atom1 - energy_per_atom2) ** 2))
 
@@ -149,16 +149,17 @@ def plot_forces(
     ax.set_ylabel("MLFF results (eV/Å)", fontsize=fontsize)
 
     ax.text(
-        0.95, 0.13, f"RMSE: {rmse:.2f} eV/Å",
+        0.95, 0.05, f"RMSE: {rmse:.2f} eV/Å",
         horizontalalignment="right",
         transform=ax.transAxes, fontsize=labelsize
     )
-
+    """
     ax.text(
         0.95, 0.05, f"RMSE/atom: {rmse_per_atom*1000:.1f} meV/(Å·atom)",
         horizontalalignment="right",
         transform=ax.transAxes, fontsize=labelsize
     )
+    """
 
     ax.set_aspect("equal", adjustable="box")
     ax.set_xlim([min_value, max_value])
